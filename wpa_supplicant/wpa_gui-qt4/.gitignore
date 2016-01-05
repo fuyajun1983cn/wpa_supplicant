@@ -2,3 +2,7 @@
 .obj
 .ui
 qrc_icons.cpp
+wpa_gui.pro.user
+.excludes
+manifest.json
+wpa-gui.json

@@ -23,7 +23,7 @@ class WpaGui : public QMainWindow, public Ui::WpaGui
 
 public:
 	WpaGui(QApplication *app, QWidget *parent = 0, const char *name = 0,
-	       Qt::WFlags fl = 0);
+           Qt::WindowFlags fl = 0);
 	~WpaGui();
 
 	virtual int ctrlRequest(const char *cmd, char *buf, size_t *buflen);
@@ -94,11 +94,13 @@ private:
 	bool networkMayHaveChanged;
 	char *ctrl_iface;
 	EventHistory *eh;
+    //send request and receive response
 	struct wpa_ctrl *ctrl_conn;
 	QSocketNotifier *msgNotifier;
 	QTimer *timer;
 	int pingsToStatusUpdate;
 	WpaMsgList msgs;
+    //monitor interface event
 	char *ctrl_iface_dir;
 	struct wpa_ctrl *monitor_conn;
 	UserDataRequest *udr;

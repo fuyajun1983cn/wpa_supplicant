@@ -34,7 +34,7 @@ WpaGuiApp::WpaGuiApp(int &argc, char **argv) : QApplication(argc, argv)
 #ifndef QT_NO_SESSIONMANAGER
 void WpaGuiApp::saveState(QSessionManager &manager)
 {
-	QApplication::saveState(manager);
+    QApplication::saveStateRequest(manager);
 	w->saveState();
 }
 #endif

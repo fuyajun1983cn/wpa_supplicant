@@ -41,8 +41,8 @@ AddInterface::AddInterface(WpaGui *_wpagui, QWidget *parent)
 	interfaceWidget->headerItem()->setText(0, tr("driver"));
 	interfaceWidget->headerItem()->setText(1, tr("interface"));
 	interfaceWidget->headerItem()->setText(2, tr("description"));
-	interfaceWidget->setItemsExpandable(FALSE);
-	interfaceWidget->setRootIsDecorated(FALSE);
+    interfaceWidget->setItemsExpandable(false);
+    interfaceWidget->setRootIsDecorated(false);
 	vboxLayout->addWidget(interfaceWidget);
 
 	connect(interfaceWidget,

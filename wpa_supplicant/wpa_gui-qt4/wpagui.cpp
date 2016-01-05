@@ -16,6 +16,7 @@
 #include <QCloseEvent>
 #include <QImageReader>
 #include <QSettings>
+#include <QDebug>
 
 #include "wpagui.h"
 #include "dirent.h"
@@ -23,7 +24,7 @@
 #include "userdatarequest.h"
 #include "networkconfig.h"
 
-#if 1
+#if 0
 /* Silence stdout */
 #define printf wpagui_printf
 static int wpagui_printf(const char *, ...)
@@ -32,7 +33,7 @@ static int wpagui_printf(const char *, ...)
 }
 #endif
 
-WpaGui::WpaGui(QApplication *_app, QWidget *parent, const char *, Qt::WFlags)
+WpaGui::WpaGui(QApplication *_app, QWidget *parent, const char *, Qt::WindowFlags)
 	: QMainWindow(parent), app(_app)
 {
 	setupUi(this);
@@ -157,12 +158,15 @@ WpaGui::WpaGui(QApplication *_app, QWidget *parent, const char *, Qt::WFlags)
 	textStatus->setText(tr("connecting to wpa_supplicant"));
 	timer = new QTimer(this);
 	connect(timer, SIGNAL(timeout()), SLOT(ping()));
-	timer->setSingleShot(FALSE);
+    timer->setSingleShot(false);
 	timer->start(1000);
 
+    qDebug()<<"IFACE: "<<ctrl_iface;
+  //  printf ("IFACE: %s\n", ctrl_iface);
+
 	if (openCtrlConnection(ctrl_iface) < 0) {
-		printf("Failed to open control connection to "
-		       "wpa_supplicant.\n");
+        qDebug()<<"Failed to open control connection to "
+               "wpa_supplicant.";
 	}
 
 	updateStatus();
@@ -232,8 +236,18 @@ void WpaGui::languageChange()
 void WpaGui::parse_argv()
 {
 	int c;
+    QStringList args= qApp->arguments();
+    qDebug()<<"Arguments: "<<args;
+
+    int argc = args.length();
+    char *argv[argc];
+    for (int i = 0; i < argc; i++) {
+        argv[i] = args.at(i).toLocal8Bit().data();
+        printf ("%s\n", argv[i]);
+    }
+
 	for (;;) {
-		c = getopt(qApp->argc(), qApp->argv(), "i:p:t");
+        c = getopt(argc, argv, "i:p:t");
 		if (c < 0)
 			break;
 		switch (c) {
@@ -403,6 +417,7 @@ int WpaGui::openCtrlConnection(const char *ifname)
 	if (wpa_ctrl_request(ctrl_conn, "INTERFACES", 10, buf, &len, NULL) >=
 	    0) {
 		buf[len] = '\0';
+        printf("Interfaces: %s\n", buf);
 		pos = buf;
 		while (*pos) {
 			pos2 = strchr(pos, '\n');
@@ -421,6 +436,7 @@ int WpaGui::openCtrlConnection(const char *ifname)
 	if (wpa_ctrl_request(ctrl_conn, "GET_CAPABILITY eap", 18, buf, &len,
 			     NULL) >= 0) {
 		buf[len] = '\0';
+        printf("Capability: %s\n", buf);
 
 		QString res(buf);
 		QStringList types = res.split(QChar(' '));
@@ -510,6 +526,7 @@ void WpaGui::updateStatus()
 	}
 
 	buf[len] = '\0';
+    qDebug()<<"STATUS: "<<buf;
 
 	bool auth_updated = false, ssid_updated = false;
 	bool bssid_updated = false, ipaddr_updated = false;
@@ -619,6 +636,7 @@ void WpaGui::updateNetworks()
 		return;
 
 	buf[len] = '\0';
+    qDebug()<<"LIST NETWORKS: "<<buf;
 	start = strchr(buf, '\n');
 	if (start == NULL)
 		return;
@@ -831,6 +849,8 @@ void WpaGui::processMsg(char *msg)
 	char *pos = msg, *pos2;
 	int priority = 2;
 
+    printf("%s\n", msg);
+
 	if (*pos == '<') {
 		/* skip priority */
 		pos++;
@@ -978,7 +998,7 @@ void WpaGui::selectNetwork( const QString &sel )
 	else
 		cmd = "any";
 	cmd.prepend("SELECT_NETWORK ");
-	ctrlRequest(cmd.toAscii().constData(), reply, &reply_len);
+    ctrlRequest(cmd.toLocal8Bit().constData(), reply, &reply_len);
 	triggerUpdate();
 	stopWpsRun(false);
 }
@@ -994,11 +1014,11 @@ void WpaGui::enableNetwork(const QString &sel)
 		cmd.truncate(cmd.indexOf(':'));
 	else if (!cmd.startsWith("all")) {
 		printf("Invalid editNetwork '%s'\n",
-		       cmd.toAscii().constData());
+               cmd.toStdString().c_str());
 		return;
 	}
 	cmd.prepend("ENABLE_NETWORK ");
-	ctrlRequest(cmd.toAscii().constData(), reply, &reply_len);
+    ctrlRequest(cmd.toStdString().c_str(), reply, &reply_len);
 	triggerUpdate();
 }
 
@@ -1013,11 +1033,11 @@ void WpaGui::disableNetwork(const QString &sel)
 		cmd.truncate(cmd.indexOf(':'));
 	else if (!cmd.startsWith("all")) {
 		printf("Invalid editNetwork '%s'\n",
-		       cmd.toAscii().constData());
+               cmd.toStdString().c_str());
 		return;
 	}
 	cmd.prepend("DISABLE_NETWORK ");
-	ctrlRequest(cmd.toAscii().constData(), reply, &reply_len);
+    ctrlRequest(cmd.toLocal8Bit().constData(), reply, &reply_len);
 	triggerUpdate();
 }
 
@@ -1103,11 +1123,11 @@ void WpaGui::removeNetwork(const QString &sel)
 		cmd.truncate(cmd.indexOf(':'));
 	else if (!cmd.startsWith("all")) {
 		printf("Invalid editNetwork '%s'\n",
-		       cmd.toAscii().constData());
+               cmd.toLocal8Bit().constData());
 		return;
 	}
 	cmd.prepend("REMOVE_NETWORK ");
-	ctrlRequest(cmd.toAscii().constData(), reply, &reply_len);
+    ctrlRequest(cmd.toLocal8Bit().constData(), reply, &reply_len);
 	triggerUpdate();
 }
 
@@ -1167,14 +1187,14 @@ int WpaGui::getNetworkDisabled(const QString &sel)
 	int pos = cmd.indexOf(':');
 	if (pos < 0) {
 		printf("Invalid getNetworkDisabled '%s'\n",
-		       cmd.toAscii().constData());
+               cmd.toLocal8Bit().constData());
 		return -1;
 	}
 	cmd.truncate(pos);
 	cmd.prepend("GET_NETWORK ");
 	cmd.append(" disabled");
 
-	if (ctrlRequest(cmd.toAscii().constData(), reply, &reply_len) >= 0
+    if (ctrlRequest(cmd.toLocal8Bit().constData(), reply, &reply_len) >= 0
 	    && reply_len >= 1) {
 		reply[reply_len] = '\0';
 		if (!str_match(reply, "FAIL"))
@@ -1257,7 +1277,7 @@ void WpaGui::saveConfig()
 
 void WpaGui::selectAdapter( const QString & sel )
 {
-	if (openCtrlConnection(sel.toAscii().constData()) < 0)
+    if (openCtrlConnection(sel.toLocal8Bit().constData()) < 0)
 		printf("Failed to open control connection to "
 		       "wpa_supplicant.\n");
 	updateStatus();
@@ -1557,7 +1577,7 @@ void WpaGui::wpsApPin()
 	size_t reply_len = sizeof(reply);
 
 	QString cmd("WPS_REG " + bssFromScan + " " + wpsApPinEdit->text());
-	if (ctrlRequest(cmd.toAscii().constData(), reply, &reply_len) < 0)
+    if (ctrlRequest(cmd.toLocal8Bit().constData(), reply, &reply_len) < 0)
 		return;
 
 	wpsStatusText->setText(tr("Waiting for AP/Enrollee"));
