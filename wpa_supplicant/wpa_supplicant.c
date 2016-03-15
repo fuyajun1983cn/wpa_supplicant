@@ -3298,6 +3298,7 @@ static int wpa_supplicant_init_iface(struct wpa_supplicant *wpa_s,
 			return -1;
 		}
 		wpa_s->confanother = os_rel2abs_path(iface->confanother);
+		wpa_printf(MSG_DEBUG, ME "confanother: %s", wpa_s->confanother);
 		wpa_config_read(wpa_s->confanother, wpa_s->conf);
 
 		/*
@@ -3580,6 +3581,7 @@ struct wpa_supplicant * wpa_supplicant_add_iface(struct wpa_global *global,
 	if (global == NULL || iface == NULL)
 		return NULL;
 
+	wpa_printf(MSG_DEBUG, ME "entering wpa_supplicant_add_iface");
 	wpa_s = wpa_supplicant_alloc();
 	if (wpa_s == NULL)
 		return NULL;
@@ -3737,7 +3739,7 @@ struct wpa_global * wpa_supplicant_init(struct wpa_params *params)
 	if (params == NULL)
 		return NULL;
 
-#ifdef CONFIG_DRIVER_NDIS
+#ifdef CONFIG_DRIVER_NDIS//network device  interface specification
 	{
 		void driver_ndis_init_ops(void);
 		driver_ndis_init_ops();
@@ -3779,18 +3781,23 @@ struct wpa_global * wpa_supplicant_init(struct wpa_params *params)
 	global->params.dbus_ctrl_interface = params->dbus_ctrl_interface;
 	if (params->pid_file)
 		global->params.pid_file = os_strdup(params->pid_file);
+	wpa_printf(MSG_DEBUG, ME "%s", global->params.pid_file);
 	if (params->ctrl_interface)
 		global->params.ctrl_interface =
 			os_strdup(params->ctrl_interface);
+	wpa_printf(MSG_DEBUG, ME "%s", global->params.ctrl_interface);
 	if (params->ctrl_interface_group)
 		global->params.ctrl_interface_group =
 			os_strdup(params->ctrl_interface_group);
+	wpa_printf(MSG_DEBUG, ME "%s", global->params.ctrl_interface_group);
 	if (params->override_driver)
 		global->params.override_driver =
 			os_strdup(params->override_driver);
+	wpa_printf(MSG_DEBUG, ME "%s", global->params.override_driver);
 	if (params->override_ctrl_interface)
 		global->params.override_ctrl_interface =
 			os_strdup(params->override_ctrl_interface);
+	wpa_printf(MSG_DEBUG, ME "%s", global->params.override_ctrl_interface);
 	wpa_debug_level = global->params.wpa_debug_level =
 		params->wpa_debug_level;
 	wpa_debug_show_keys = global->params.wpa_debug_show_keys =
@@ -3807,7 +3814,7 @@ struct wpa_global * wpa_supplicant_init(struct wpa_params *params)
 	}
 
 	random_init(params->entropy_file);
-
+	//global control interface
 	global->ctrl_iface = wpa_supplicant_global_ctrl_iface_init(global);
 	if (global->ctrl_iface == NULL) {
 		wpa_supplicant_deinit(global);
@@ -3833,6 +3840,7 @@ struct wpa_global * wpa_supplicant_init(struct wpa_params *params)
 	}
 
 #ifdef CONFIG_WIFI_DISPLAY
+	wpa_printf(MSG_DEBUG, ME "init wifi_display\n");
 	if (wifi_display_init(global) < 0) {
 		wpa_printf(MSG_ERROR, "Failed to initialize Wi-Fi Display");
 		wpa_supplicant_deinit(global);
@@ -3857,6 +3865,7 @@ int wpa_supplicant_run(struct wpa_global *global)
 {
 	struct wpa_supplicant *wpa_s;
 
+	wpa_printf(MSG_DEBUG, ME "entering wpa_supplicant_run");
 	if (global->params.daemonize &&
 	    wpa_supplicant_daemon(global->params.pid_file))
 		return -1;

@@ -31,7 +31,7 @@ static FILE *wpa_debug_tracing_file = NULL;
 
 int wpa_debug_level = MSG_INFO;
 int wpa_debug_show_keys = 0;
-int wpa_debug_timestamp = 0;
+int wpa_debug_timestamp = 1;
 
 
 #ifdef CONFIG_ANDROID_LOG
@@ -127,6 +127,8 @@ int wpa_debug_open_linux_tracing(void)
 	char buf[4096] = {};
 	ssize_t buflen;
 	char *line, *tmp1, *path = NULL;
+
+	wpa_printf(MSG_DEBUG, ME "entering %s", __FUNCTION__);
 
 	mounts = open("/proc/mounts", O_RDONLY);
 	if (mounts < 0) {
@@ -539,7 +541,7 @@ int wpa_debug_open_file(const char *path)
 #ifdef CONFIG_DEBUG_FILE
 	if (!path)
 		return 0;
-
+	wpa_printf(MSG_DEBUG, ME "entering wpa_debug_open_file...");
 	if (last_path == NULL || os_strcmp(last_path, path) != 0) {
 		/* Save our path to enable re-open */
 		os_free(last_path);

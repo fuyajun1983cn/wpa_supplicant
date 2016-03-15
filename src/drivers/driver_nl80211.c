@@ -3494,36 +3494,47 @@ static void wiphy_info_cipher_suites(struct wiphy_info_data *info,
 		switch (c) {
 		case WLAN_CIPHER_SUITE_CCMP_256:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_CCMP_256;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_CCMP_256\n");
 			break;
 		case WLAN_CIPHER_SUITE_GCMP_256:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_GCMP_256;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_GCMP_256\n");
 			break;
 		case WLAN_CIPHER_SUITE_CCMP:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_CCMP;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_CCMP\n");
 			break;
 		case WLAN_CIPHER_SUITE_GCMP:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_GCMP;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_GCMP\n");
 			break;
 		case WLAN_CIPHER_SUITE_TKIP:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_TKIP;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_TKIP\n");
 			break;
 		case WLAN_CIPHER_SUITE_WEP104:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_WEP104;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_WEP104\n");
 			break;
 		case WLAN_CIPHER_SUITE_WEP40:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_WEP40;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_WEP40\n");
 			break;
 		case WLAN_CIPHER_SUITE_AES_CMAC:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_BIP;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_AES_CMAC\n");
 			break;
 		case WLAN_CIPHER_SUITE_BIP_GMAC_128:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_BIP_GMAC_128;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_BIP_GMAC_128\n");
 			break;
 		case WLAN_CIPHER_SUITE_BIP_GMAC_256:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_BIP_GMAC_256;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_BIP_GMAC_256\n");
 			break;
 		case WLAN_CIPHER_SUITE_BIP_CMAC_256:
 			info->capa->enc |= WPA_DRIVER_CAPA_ENC_BIP_CMAC_256;
+			wpa_printf(MSG_DEBUG, ME "WLAN_CIPHER_SUITE_BIP_CMAC_256\n");
 			break;
 		}
 	}

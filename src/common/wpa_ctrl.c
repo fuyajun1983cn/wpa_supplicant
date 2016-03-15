@@ -108,6 +108,7 @@ try_again:
 		os_free(ctrl);
 		return NULL;
 	}
+	wpa_printf(MSG_DEBUG, ME "ctrl->local.sun_path: %s", ctrl->local.sun_path);
 	tries++;
 	if (bind(ctrl->s, (struct sockaddr *) &ctrl->local,
 		    sizeof(ctrl->local)) < 0) {
@@ -178,6 +179,7 @@ try_again:
 			os_free(ctrl);
 			return NULL;
 		}
+		wpa_printf(MSG_DEBUG, ME "ctrl->dest.sun_path: %s", ctrl->dest.sun_path);
 	}
 	if (connect(ctrl->s, (struct sockaddr *) &ctrl->dest,
 		    sizeof(ctrl->dest)) < 0) {

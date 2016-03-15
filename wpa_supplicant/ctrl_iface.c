@@ -6700,6 +6700,8 @@ char * wpa_supplicant_global_ctrl_iface_process(struct wpa_global *global,
 	int reply_len;
 	int level = MSG_DEBUG;
 
+	wpa_printf(MSG_DEBUG, ME "Global: entering wpa_supplicant_global_ctrl_iface_process");
+
 	if (os_strncmp(buf, "IFNAME=", 7) == 0) {
 		char *pos = os_strchr(buf + 7, ' ');
 		if (pos) {

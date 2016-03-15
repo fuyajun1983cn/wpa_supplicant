@@ -298,6 +298,8 @@ static void wpa_supplicant_ctrl_iface_msg_cb(void *ctx, int level, int global,
 {
 	struct wpa_supplicant *wpa_s = ctx;
 
+	wpa_printf(MSG_DEBUG, ME "Interface: entering wpa_supplicant_ctrl_iface_msg_cb");
+
 	if (wpa_s == NULL)
 		return;
 
@@ -439,6 +441,7 @@ static int wpas_ctrl_iface_open_sock(struct wpa_supplicant *wpa_s,
 	fname = wpa_supplicant_ctrl_iface_path(wpa_s);
 	if (fname == NULL)
 		goto fail;
+	wpa_printf(MSG_DEBUG, ME "ctrl iface path = %s\n", fname);
 	os_strlcpy(addr.sun_path, fname, sizeof(addr.sun_path));
 	if (bind(priv->sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
 		wpa_printf(MSG_DEBUG, "ctrl_iface bind(PF_UNIX) failed: %s",
@@ -807,6 +810,8 @@ static void wpa_supplicant_global_ctrl_iface_receive(int sock, void *eloop_ctx,
 	char *reply = NULL, *reply_buf = NULL;
 	size_t reply_len;
 
+	wpa_printf(MSG_DEBUG, ME "entering wpa_supplicant_global_ctrl_iface_receive");
+
 	res = recvfrom(sock, buf, sizeof(buf) - 1, 0,
 		       (struct sockaddr *) &from, &fromlen);
 	if (res < 0) {
@@ -860,7 +865,7 @@ static int wpas_global_ctrl_iface_open_sock(struct wpa_global *global,
 	const char *ctrl = global->params.ctrl_interface;
 	int flags;
 
-	wpa_printf(MSG_DEBUG, "Global control interface '%s'", ctrl);
+	wpa_printf(MSG_DEBUG, ME "Global control interface '%s'", ctrl);
 
 #ifdef ANDROID
 	if (os_strncmp(ctrl, "@android:", 9) == 0) {
@@ -1030,6 +1035,8 @@ struct ctrl_iface_global_priv *
 wpa_supplicant_global_ctrl_iface_init(struct wpa_global *global)
 {
 	struct ctrl_iface_global_priv *priv;
+
+	wpa_printf(MSG_DEBUG, ME "entering wpa_supplicant_global_ctrl_iface_init...");
 
 	priv = os_zalloc(sizeof(*priv));
 	if (priv == NULL)

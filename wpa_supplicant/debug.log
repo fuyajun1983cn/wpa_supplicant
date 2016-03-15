@@ -1,0 +1,13 @@
+wpa_supplicant v2.1
+random: Trying to read entropy from /dev/random
+Yajun=>entering wpa_supplicant_global_ctrl_iface_init...
+Successfully initialized wpa_supplicant
+Yajun=>entering wpa_supplicant_add_iface
+Initializing interface 'p2p0' conf './p2p_supplicant.conf' driver 'nl80211' ctrl_interface 'N/A' bridge 'N/A'
+Configuration file './p2p_supplicant.conf' -> '/home/fuyajun/MyPlayground/wifi/hostap/wpa_supplicant/./p2p_supplicant.conf'
+Reading configuration file '/home/fuyajun/MyPlayground/wifi/hostap/wpa_supplicant/./p2p_supplicant.conf'
+Failed to open config file '/home/fuyajun/MyPlayground/wifi/hostap/wpa_supplicant/./p2p_supplicant.conf', error: No such file or directory
+Failed to read or parse configuration '/home/fuyajun/MyPlayground/wifi/hostap/wpa_supplicant/./p2p_supplicant.conf'.
+Failed to add interface p2p0
+: Cancelling scan request
+: Cancelling authentication timeout
