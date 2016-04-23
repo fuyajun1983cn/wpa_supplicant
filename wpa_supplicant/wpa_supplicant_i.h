@@ -323,7 +323,7 @@ struct wpa_radio_work {
 	const char *type;
 	struct wpa_supplicant *wpa_s;
 	void (*cb)(struct wpa_radio_work *work, int deinit);
-	void *ctx;
+	void *ctx;  //pointer to struct wpa_connect_work  ==>Yajun
 	unsigned int started:1;
 	struct os_reltime time;
 	unsigned int bands;
@@ -448,7 +448,7 @@ struct wpa_supplicant {
 	struct dl_list radio_list; /* list head: struct wpa_radio::ifaces */
 	struct wpa_supplicant *parent;
 	struct wpa_supplicant *next;
-	struct l2_packet_data *l2;
+	struct l2_packet_data *l2;//layer 2 packet  ==>Yajun
 	struct l2_packet_data *l2_br;
 	unsigned char own_addr[ETH_ALEN];
 	unsigned char perm_addr[ETH_ALEN];
@@ -735,7 +735,7 @@ struct wpa_supplicant {
 #endif /* CONFIG_SME */
 
 #ifdef CONFIG_AP
-	struct hostapd_iface *ap_iface;
+	struct hostapd_iface *ap_iface;  //ap mode interface
 	void (*ap_configured_cb)(void *ctx, void *data);
 	void *ap_configured_cb_ctx;
 	void *ap_configured_cb_data;
@@ -890,8 +890,8 @@ struct wpa_supplicant {
 	int wps_ap_iter;
 
 	int after_wps;
-	int known_wps_freq;
-	unsigned int wps_freq;
+	int known_wps_freq;//if know wps freq or not  ==>Yajun
+	unsigned int wps_freq; //hode wps freq value     ==>Yajun
 	int wps_fragment_size;
 	int auto_reconnect_disabled;
 

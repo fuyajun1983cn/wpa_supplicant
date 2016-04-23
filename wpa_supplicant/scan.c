@@ -2115,7 +2115,7 @@ wpa_supplicant_get_scan_results(struct wpa_supplicant *wpa_s,
 	}
 
 #ifdef CONFIG_WPS
-	if (wpas_wps_searching(wpa_s)) {
+	if (wpas_wps_searching(wpa_s)) {//Scan due to WPS setup?  ==>Yajun
 		wpa_dbg(wpa_s, MSG_DEBUG, "WPS: Order scan results with WPS "
 			"provisioning rules");
 		compar = wpa_scan_result_wps_compar;

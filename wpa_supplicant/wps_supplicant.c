@@ -922,6 +922,7 @@ static void wpas_clear_wps(struct wpa_supplicant *wpa_s)
 	wpa_s->after_wps = 0;
 	wpa_s->known_wps_freq = 0;
 
+	//save last wps ssid
 	prev_current = wpa_s->current_ssid;
 
 	/* Enable the networks disabled during wpas_wps_reassoc */
@@ -986,12 +987,13 @@ static struct wpa_ssid * wpas_wps_add_network(struct wpa_supplicant *wpa_s,
 {
 	struct wpa_ssid *ssid;
 
+	//should return a newly created network  ==>Yajun
 	ssid = wpa_config_add_network(wpa_s->conf);
 	if (ssid == NULL)
 		return NULL;
 	wpas_notify_network_added(wpa_s, ssid);
 	wpa_config_set_network_defaults(ssid);
-	ssid->temporary = 1;
+	ssid->temporary = 1; //tempary network, not saved  ==>Yajun
 	if (wpa_config_set(ssid, "key_mgmt", "WPS", 0) < 0 ||
 	    wpa_config_set(ssid, "eap", "WSC", 0) < 0 ||
 	    wpa_config_set(ssid, "identity", registrar ?
@@ -1014,13 +1016,17 @@ static struct wpa_ssid * wpas_wps_add_network(struct wpa_supplicant *wpa_s,
 #endif /* CONFIG_P2P */
 
 		os_memcpy(ssid->bssid, bssid, ETH_ALEN);
-		ssid->bssid_set = 1;
+		ssid->bssid_set = 1;//BSSID is configured for this network =>Yajun
 
 		/*
 		 * Note: With P2P, the SSID may change at the time the WPS
 		 * provisioning is started, so better not filter the AP based
 		 * on the current SSID in the scan results.
 		 */
+		 /*  ==>Yajun
+		   *  In normal case, one AP(bss) has only one ssid
+		   *  but some AP may have more than one SSID.
+		   */
 #ifndef CONFIG_P2P
 		dl_list_for_each(bss, &wpa_s->bss, struct wpa_bss, list) {
 			if (os_memcmp(bssid, bss->bssid, ETH_ALEN) != 0)
@@ -1110,6 +1116,7 @@ static void wpas_wps_reassoc(struct wpa_supplicant *wpa_s,
 		}
 	}
 
+	//mark all other network disabled to trigger reassociate ==>Yajun
 	wpas_wps_temp_disable(wpa_s, selected);
 
 	wpa_s->disconnected = 0;
@@ -1140,8 +1147,8 @@ int wpas_wps_start_pbc(struct wpa_supplicant *wpa_s, const u8 *bssid,
 	ssid = wpas_wps_add_network(wpa_s, 0, NULL, bssid);
 	if (ssid == NULL)
 		return -1;
-	ssid->temporary = 1;
-	ssid->p2p_group = p2p_group;
+	ssid->temporary = 1;//tempary network, not saved  ==>Yajun
+	ssid->p2p_group = p2p_group;//Network generated as a p2p group ==>Yajun
 #ifdef CONFIG_P2P
 	if (p2p_group && wpa_s->go_params && wpa_s->go_params->ssid_len) {
 		ssid->ssid = os_zalloc(wpa_s->go_params->ssid_len + 1);
@@ -1158,6 +1165,7 @@ int wpas_wps_start_pbc(struct wpa_supplicant *wpa_s, const u8 *bssid,
 		return -1;
 	if (wpa_s->wps_fragment_size)
 		ssid->eap.fragment_size = wpa_s->wps_fragment_size;
+	//set WPS 2 minutes timeout ==>Yajun
 	eloop_register_timeout(WPS_PBC_WALK_TIME, 0, wpas_wps_timeout,
 			       wpa_s, NULL);
 	wpas_wps_reassoc(wpa_s, ssid, bssid, 0);

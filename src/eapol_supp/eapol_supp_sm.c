@@ -128,7 +128,7 @@ struct eapol_sm {
 	struct wpabuf *eapReqData; /* for EAP */
 	Boolean altAccept; /* for EAP */
 	Boolean altReject; /* for EAP */
-	Boolean eapTriggerStart;
+	Boolean eapTriggerStart;//imeidately send EAPOL-START or not?  ==>Yajun
 	Boolean replay_counter_valid;
 	u8 last_replay_counter[16];
 	struct eapol_config conf;
@@ -958,7 +958,7 @@ void eapol_sm_step(struct eapol_sm *sm)
 				sm->changed = TRUE;
 		} else
 #endif /* CONFIG_EAP_PROXY */
-		if (eap_peer_sm_step(sm->eap))
+		if (eap_peer_sm_step(sm->eap))//step EAP peer statemachine ==>Yajun
 			sm->changed = TRUE;
 		if (!sm->changed)
 			break;

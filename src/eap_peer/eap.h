@@ -122,7 +122,7 @@ enum eapol_int_var {
 	 * EAPOL state machine timers. EAP state machine reads and writes this
 	 * value.
 	 */
-	EAPOL_idleWhile
+	EAPOL_idleWhile//外部计时器，等待一个合法的请求时超时时间
 };
 
 /**
@@ -135,6 +135,8 @@ enum eapol_int_var {
  * callback functions.
  */
 struct eapol_callbacks {
+
+	/* ctx  -->  struct eapol_sm */
 	/**
 	 * get_config - Get pointer to the current network configuration
 	 * @ctx: eapol_ctx from eap_peer_sm_init() call

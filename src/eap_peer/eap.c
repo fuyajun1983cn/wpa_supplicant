@@ -32,7 +32,9 @@
 #define STATE_MACHINE_DATA struct eap_sm
 #define STATE_MACHINE_DEBUG_PREFIX "EAP"
 
+//EAP Request <--> EAP Response 最大的来回交互趟数
 #define EAP_MAX_AUTH_ROUNDS 50
+//the longest time we should wait for a valid EAP Request
 #define EAP_CLIENT_TIMEOUT_DEFAULT 60
 
 

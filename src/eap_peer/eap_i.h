@@ -293,9 +293,46 @@ struct eap_erp_key {
  */
 struct eap_sm {
 	enum {
-		EAP_INITIALIZE, EAP_DISABLED, EAP_IDLE, EAP_RECEIVED,
-		EAP_GET_METHOD, EAP_METHOD, EAP_SEND_RESPONSE, EAP_DISCARD,
-		EAP_IDENTITY, EAP_NOTIFICATION, EAP_RETRANSMIT, EAP_SUCCESS,
+		//当状态机激活时，初始化变量
+		EAP_INITIALIZE, 
+		/*
+		 * 当端口使能时，会立即转入INITIALIZE状态。
+		 */
+		EAP_DISABLED, 
+		/*
+		* 状态机大部分时间都处于该状态，等待事件的发生。
+		*/
+		EAP_IDLE, 
+		// 在收到EAP数据包时，会进入该状态。
+		EAP_RECEIVED,
+		/*
+		* 当请求新的类型时，会进入该状态。 
+		* 要么启动了正确的方法，要么构建
+		* 一个Nak响应包
+             */
+		EAP_GET_METHOD, 
+		/*
+		  *  方法处理发生在此状态。
+		  来自Authenticator的请求会被处理，
+		  并创建一个
+               合适的响应包
+              */
+		EAP_METHOD, 
+		//该状态向底层表示一个响应包已经准备
+		//就绪，可以发送出去了。
+		EAP_SEND_RESPONSE, 
+		//该状态向底层表示请求已经被丢弃，
+		//此时也不会发送响应包
+		EAP_DISCARD,
+		// 处理Identity方法请求，并构建一个响应包
+		EAP_IDENTITY, 
+		//处理Notification方法请求，并构建一个响应包
+		EAP_NOTIFICATION, 
+		//重传之前的响应包。
+		EAP_RETRANSMIT, 
+		//终态，显示成功
+		EAP_SUCCESS,
+		//终态，显示失败
 		EAP_FAILURE
 	} EAP_state;
 	/* Long-term local variables */
@@ -304,21 +341,33 @@ struct eap_sm {
 	int lastId;
 	struct wpabuf *lastRespData;
 	EapDecision decision;
-	/* Short-term local variables */
+	/* Short-term local variables (Not Maintained between Packet)*/
+	//在RECEIVED状态中设置。显示当前收到的数据包是一个EAP请求包。
 	Boolean rxReq;
+	//在RECEIVED状态中设置。显示当前收到的数据包是一个EAP成功包
 	Boolean rxSuccess;
+	//在RECEIVED状态中设置。显示当前收到的数据包是一个EAP失败包
 	Boolean rxFailure;
+	//在RECEIVED状态中设置。该标识值与当前EAP请求关联。
 	int reqId;
+	//在RECEIVED状态中设置。显示当前EAP请求的方法类型。
 	EapType reqMethod;
 	int reqVendor;
 	u32 reqVendorMethod;
+	// 在METHOD状态中设置，显示当前方法是否决定要丢弃当前的数据包。
 	Boolean ignore;
 	/* Constants */
+	//等待一个合法请求时，最长的等待时间。
 	int ClientTimeout;
 
 	/* Miscellaneous variables */
 	Boolean allowNotifications; /* peer state machine <-> methods */
+	//EAP Response data that'g going to be send
 	struct wpabuf *eapRespData; /* peer to lower layer */
+	/*
+	  当keying material可用时，Peer状态机会在SUCCESS状态下设置该值为
+       TRUE。实际Key存储在eapKeyData中
+       */
 	Boolean eapKeyAvailable; /* peer to lower layer */
 	u8 *eapKeyData; /* peer to lower layer */
 	size_t eapKeyDataLen; /* peer to lower layer */
@@ -329,7 +378,7 @@ struct eap_sm {
 	Boolean changed;
 	void *eapol_ctx;
 	const struct eapol_callbacks *eapol_cb;
-	void *eap_method_priv;
+	void *eap_method_priv;//pointer to the return value from EAP  init method
 	int init_phase2;
 	int fast_reauth;
 	Boolean reauthInit; /* send EAP-Identity/Re-auth */
