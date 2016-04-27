@@ -9374,8 +9374,16 @@ static int wpas_global_ctrl_iface_set(struct wpa_global *global, char *cmd)
 	}
 #endif /* CONFIG_WIFI_DISPLAY */
 
-	/* Restore cmd to its original value to allow redirection */
-	value[-1] = ' ';
+#ifdef CONFIG_FYJ_WFD_TEST
+	if (os_strcasecmp(cmd, "wfd_bssid") == 0) {
+		return wifi_display_set_wfd_bssid(global, cmd, value);
+	} else 
+#endif
+        {
+
+		/* Restore cmd to its original value to allow redirection */
+		value[-1] = ' ';
+	}
 
 	return -1;
 }

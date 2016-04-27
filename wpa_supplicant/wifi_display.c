@@ -416,3 +416,27 @@ char * wifi_display_subelem_hex(const struct wpabuf *wfd_subelems, u8 id)
 
 	return subelem;
 }
+
+#ifdef CONFIG_FYJ_WFD_TEST
+int wifi_display_set_wfd_bssid(struct wpa_global *global, char *cmd, char *bssid)
+{
+	if (!bssid || strlen(bssid) != 12) {
+		wpa_printf(MSG_ERROR, "bssid is invalid");
+		return -1;
+	}
+
+	wpa_printf(MSG_INFO, "WFD: set %s = %s", cmd, bssid);
+	if (os_strcasecmp(cmd, "wfd_bssid") == 0) {
+		char allinfo[32];
+		memset(allinfo, 0, sizeof(allinfo));
+		os_snprintf(allinfo, "1 %04x%s", 6, bssid);
+		wpa_printf(MSG_INFO, "wifi_display_subelem_set = [%s]", allinfo);
+		return wifi_display_subelem_set(global, allinfo);
+	} else {
+		wpa_printf(MSG_ERROR, "unkown command");
+		return -1;
+	}
+
+	return 0;
+}
+#endif

@@ -21,4 +21,8 @@ int wifi_display_subelem_get(struct wpa_global *global, char *cmd,
 			     char *buf, size_t buflen);
 char * wifi_display_subelem_hex(const struct wpabuf *wfd_subelems, u8 id);
 
+#ifdef CONFIG_FYJ_WFD_TEST
+int wifi_display_set_wfd_bssid(struct wpa_global *global, char *cmd, char *bssid);
+#endif
+
 #endif /* WIFI_DISPLAY_H */
