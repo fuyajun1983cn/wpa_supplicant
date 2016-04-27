@@ -353,7 +353,7 @@ struct wpa_config {
 	/**
 	 * pssid - Per-priority network lists (in priority order)
 	 */
-	struct wpa_ssid **pssid;
+	struct wpa_ssid **pssid;//处于同一优先级的SSID列表==>Yajun
 
 	/**
 	 * num_prio - Number of different priorities used in the pssid lists

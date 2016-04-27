@@ -2356,6 +2356,33 @@ static void wpas_dev_lost(void *ctx, const u8 *dev_addr)
 	wpa_msg_global(wpa_s, MSG_INFO, P2P_EVENT_DEVICE_LOST
 		       "p2p_dev_addr=" MACSTR, MAC2STR(dev_addr));
 
+#ifdef CONFIG_FYJ_P2P_TEST
+	//flush p2p scan results to 
+	//data/misc/wifi/p2p_devices.cache
+	#define P2P_CACHE_FILE "/data/misc/wifi/p2p_devices.cache"
+	if (wpa_s->p2p_scan_res_cache) {
+		wpa_printf(MSG_DEBUG, "flush p2p scan results to %s", P2P_CACHE_FILE);
+		FILE *f = fopen(P2P_CACHE_FILE, "w");
+		if (f == NULL) {
+			wpa_printf(MSG_ERROR, "failed to open %s\n", P2P_CACHE_FILE);
+			goto done;
+		}
+
+		struct p2p_data *p2p;
+		struct p2p_device *dev;
+
+		p2p = wpa_s->global->p2p;
+		dl_list_for_each(dev,&p2p->devices, struct p2p_device, list) {
+			//...
+			fprintf(f, "p2p_device_addr="MACSTR"\n", MAC2STR(dev->info.p2p_device_addr));
+			//...
+		}
+		
+		fclose(f);
+	}
+done:
+#endif
+
 	wpas_notify_p2p_device_lost(wpa_s, dev_addr);
 }
 

@@ -39,7 +39,7 @@ enum p2p_go_state {
  * struct p2p_device - P2P Device data (internal to P2P module)
  */
 struct p2p_device {
-	struct dl_list list;
+	struct dl_list list;//link to the known p2p device list ==>Yajun
 	struct os_reltime last_seen;
 	int listen_freq;
 	int oob_go_neg_freq;

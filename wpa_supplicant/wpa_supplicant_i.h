@@ -769,7 +769,7 @@ struct wpa_supplicant {
 	unsigned int roc_waiting_drv_freq;
 	int action_tx_wait_time;
 
-	int p2p_mgmt;
+	int p2p_mgmt;  //indicate a p2p interface
 
 #ifdef CONFIG_P2P
 	struct p2p_go_neg_results *go_params;
@@ -970,6 +970,11 @@ struct wpa_supplicant {
 	u8 *mac_addr_scan;
 	u8 *mac_addr_sched_scan;
 	u8 *mac_addr_pno;
+
+#ifdef CONFIG_FYJ_P2P_TEST
+	//used to control cache p2p scan results or not ==>Yajun
+	int p2p_scan_res_cache;
+#endif
 
 #ifdef CONFIG_WNM
 	u8 wnm_dialog_token;

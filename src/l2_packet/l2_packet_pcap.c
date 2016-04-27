@@ -24,11 +24,11 @@ static const u8 pae_group_addr[ETH_ALEN] =
 { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x03 };
 
 struct l2_packet_data {
-	pcap_t *pcap;
+	pcap_t *pcap;//handle to pcap_open_live(...)
 #ifdef CONFIG_WINPCAP
 	unsigned int num_fast_poll;
 #else /* CONFIG_WINPCAP */
-	eth_t *eth;
+	eth_t *eth; //return value from eth_open(...) ==>Yajun
 #endif /* CONFIG_WINPCAP */
 	char ifname[100];
 	u8 own_addr[ETH_ALEN];
