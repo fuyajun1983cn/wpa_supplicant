@@ -1099,6 +1099,158 @@ wpa_supplicant_select_bss(struct wpa_supplicant *wpa_s,
 	return NULL;
 }
 
+#ifdef CONFIG_FYJ_ORANGE
+/*
+  * select bss according to different priority rule
+  * WPA2/WPA PSK > WEP > EAP 802.1X > Open
+  */
+ static struct wpa_bss *
+wpa_supplicant_select_bss_weppsk(struct wpa_supplicant *wpa_s,
+			  struct wpa_ssid *group,
+			  struct wpa_ssid **selected_ssid,
+			  int only_first_ssid))
+{
+	unsigned int i;
+	struct wpa_ie_data ie_data;
+	const u8 *rsn_ie,  *wpa_ie;
+
+	if (only_first_ssid)
+			wpa_dbg(wpa_s, MSG_DEBUG, "Try to find BSS matching pre-selected network id=%d",
+				group->id);
+	else
+		wpa_dbg(wpa_s, MSG_DEBUG, "Selecting BSS from priority group %d",
+			group->priority);
+
+	for (i = 0; i < wpa_s->last_scan_res_used; i++) {
+		struct wpa_bss *bss = wpa_s->last_scan_res[i];
+
+		const u8 *ie, *ssid;
+		u8 ssid_len;
+
+		//skip non wep/psk AP
+		rsn_ie = wpa_bss_get_ie(bss, WLAN_EID_RSN);
+		wpa_ie = wpa_bss_get_vendor_ie(bss, WPA_IE_VENDOR_TYPE);
+		if (rsn_ie) {
+			wpa_parse_wpa_ie(rsn_ie, 2 + rsn_ie[1],  &ie_data);
+			if (!wpa_key_mgmt_wpa_psk(ie_data.key_mgmt))
+				continue;
+		} else if (wpa_ie) {
+			wpa_parse_wpa_ie(wpa_ie, 2 + wpa_ie[1], &ie_data);
+			if (!wpa_key_mgmt_wpa_psk(ie_data.key_mgmt))
+				continue;
+		} else {
+			if (!(bss->caps & IEEE80211_CAP_PRIVACY))
+				continue;
+		}
+
+		
+		*selected_ssid = wpa_scan_res_match(wpa_s, i, bss, group,
+						    only_first_ssid);
+		if (!*selected_ssid)
+			continue;
+		wpa_dbg(wpa_s, MSG_DEBUG, "   selected BSS " MACSTR
+			" ssid='%s'",
+			MAC2STR(bss->bssid),
+			wpa_ssid_txt(bss->ssid, bss->ssid_len));
+		return bss;
+	}
+
+	return NULL;
+}
+
+static struct wpa_bss *
+wpa_supplicant_select_bss_eap(struct wpa_supplicant *wpa_s,
+			  struct wpa_ssid *group,
+			  struct wpa_ssid **selected_ssid,
+			  int only_first_ssid))
+{
+	unsigned int i;
+	struct wpa_ie_data ie_data;
+	const u8 *rsn_ie,  *wpa_ie;
+
+	if (only_first_ssid)
+			wpa_dbg(wpa_s, MSG_DEBUG, "Try to find BSS matching pre-selected network id=%d",
+				group->id);
+	else
+		wpa_dbg(wpa_s, MSG_DEBUG, "Selecting BSS from priority group %d",
+			group->priority);
+
+	for (i = 0; i < wpa_s->last_scan_res_used; i++) {
+		struct wpa_bss *bss = wpa_s->last_scan_res[i];
+
+		const u8 *ie, *ssid;
+		u8 ssid_len;
+
+		//skip non EAP AP
+		rsn_ie = wpa_bss_get_ie(bss, WLAN_EID_RSN);
+		wpa_ie = wpa_bss_get_vendor_ie(bss, WPA_IE_VENDOR_TYPE);
+		if (rsn_ie) {
+			wpa_parse_wpa_ie(rsn_ie, 2 + rsn_ie[1],  &ie_data);
+			if (!wpa_key_mgmt_wpa_ieee8021x(ie_data.key_mgmt))
+				continue;
+		} else if (wpa_ie) {
+			wpa_parse_wpa_ie(wpa_ie, 2 + wpa_ie[1], &ie_data);
+			if (!wpa_key_mgmt_wpa_ieee8021x(ie_data.key_mgmt))
+				continue;
+		} else {
+			if (!(bss->caps & IEEE80211_CAP_PRIVACY))
+				continue;
+		}
+
+		
+		*selected_ssid = wpa_scan_res_match(wpa_s, i, bss, group,
+						    only_first_ssid);
+		if (!*selected_ssid)
+			continue;
+		wpa_dbg(wpa_s, MSG_DEBUG, "   selected BSS " MACSTR
+			" ssid='%s'",
+			MAC2STR(bss->bssid),
+			wpa_ssid_txt(bss->ssid, bss->ssid_len));
+		return bss;
+	}
+
+	return NULL;
+}
+
+static struct wpa_bss *
+wpa_supplicant_select_bss_open(struct wpa_supplicant *wpa_s,
+			  struct wpa_ssid *group,
+			  struct wpa_ssid **selected_ssid,
+			  int only_first_ssid))
+{
+	unsigned int i;
+	struct wpa_ie_data ie_data;
+	const u8 *rsn_ie,  *wpa_ie;
+
+	if (only_first_ssid)
+			wpa_dbg(wpa_s, MSG_DEBUG, "Try to find BSS matching pre-selected network id=%d",
+				group->id);
+	else
+		wpa_dbg(wpa_s, MSG_DEBUG, "Selecting BSS from priority group %d",
+			group->priority);
+
+	for (i = 0; i < wpa_s->last_scan_res_used; i++) {
+		struct wpa_bss *bss = wpa_s->last_scan_res[i];
+
+		//skip non Open AP		
+		if (bss->caps & IEEE80211_CAP_PRIVACY)
+			continue;	
+		
+		*selected_ssid = wpa_scan_res_match(wpa_s, i, bss, group,
+						    only_first_ssid);
+		if (!*selected_ssid)
+			continue;
+		wpa_dbg(wpa_s, MSG_DEBUG, "   selected BSS " MACSTR
+			" ssid='%s'",
+			MAC2STR(bss->bssid),
+			wpa_ssid_txt(bss->ssid, bss->ssid_len));
+		return bss;
+	}
+
+	return NULL;
+}
+
+#endif
 
 struct wpa_bss * wpa_supplicant_pick_network(struct wpa_supplicant *wpa_s,
 					     struct wpa_ssid **selected_ssid)
@@ -1123,6 +1275,33 @@ struct wpa_bss * wpa_supplicant_pick_network(struct wpa_supplicant *wpa_s,
 	}
 
 	while (selected == NULL) {
+		
+#ifdef CONFIG_FYJ_ORANGE
+	//wpa/wpa2 psk
+	for (prio = 0; prio < wpa_s->conf->num_prio; prio++) {
+		selected = wpa_supplicant_select_bss_wpapsk(wpa_s, wpa_s->conf->pssid[prio], selected_ssid, 1);
+		if (selected)
+			break;
+	}
+
+	//eap
+	if (!selected) {
+		for (prio = 0; prio < wpa_s->conf->num_prio; prio++) {
+			selected = wpa_supplicant_select_bss_eap(wpa_s, wpa_s->conf->pssid[prio], selected_ssid, 1);
+			if (selected)
+				break;
+		}
+	}
+
+	//open
+	if (!selected) {
+		for (prio = 0; prio < wpa_s->conf->num_prio; prio++) {
+			selected = wpa_supplicant_select_bss_open(wpa_s, wpa_s->conf->pssid[prio], selected_ssid, 1);
+			if (selected)
+				break;
+		}
+	}
+#else
 		for (prio = 0; prio < wpa_s->conf->num_prio; prio++) {
 			if (next_ssid && next_ssid->priority ==
 			    wpa_s->conf->pssid[prio]->priority) {
@@ -1137,7 +1316,7 @@ struct wpa_bss * wpa_supplicant_pick_network(struct wpa_supplicant *wpa_s,
 			if (selected)
 				break;
 		}
-
+#endif
 		if (selected == NULL && wpa_s->blacklist &&
 		    !wpa_s->countermeasures) {
 			wpa_dbg(wpa_s, MSG_DEBUG, "No APs found - clear "
