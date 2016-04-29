@@ -482,7 +482,7 @@ struct wpa_supplicant {
 	struct wpa_ssid *last_ssid;
 	struct wpa_bss *current_bss;
 	int ap_ies_from_associnfo;
-	unsigned int assoc_freq;
+	unsigned int assoc_freq;   //associated Channel with ap ==>Yajun
 
 	/* Selected configuration (based on Beacon/ProbeResp WPA IE) */
 	int pairwise_cipher;
@@ -694,7 +694,7 @@ struct wpa_supplicant {
 	int set_ap_uapsd;
 	int ap_uapsd;
 
-#ifdef CONFIG_SME
+#ifdef CONFIG_SME   //System Management Entity ==>Yajun
 	struct {
 		u8 ssid[SSID_MAX_LEN];
 		size_t ssid_len;
