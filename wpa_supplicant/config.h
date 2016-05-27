@@ -743,7 +743,7 @@ struct wpa_config {
 	 * group for P2P client role on any disconnection after the data
 	 * connection has been established.
 	 */
-	int p2p_group_idle;
+	int p2p_group_idle; //group remaining life time when there is only one GO or GC in a p2p group ==> Yajun
 
 	/**
 	 * p2p_go_freq_change_policy - The GO frequency change policy

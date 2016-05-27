@@ -248,6 +248,7 @@ static int hostap_init_sockets(struct hostap_driver_data *drv, u8 *own_addr)
 	wpa_printf(MSG_DEBUG, "Opening raw packet socket for ifindex %d",
 		   addr.sll_ifindex);
 
+	//setting local address ==>Yajun
 	if (bind(drv->sock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
 		wpa_printf(MSG_ERROR, "bind: %s", strerror(errno));
 		return -1;

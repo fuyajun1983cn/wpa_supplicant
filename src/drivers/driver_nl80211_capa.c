@@ -685,7 +685,7 @@ static int wpa_driver_nl80211_get_info(struct wpa_driver_nl80211_data *drv,
 	if (send_and_recv_msgs(drv, msg, wiphy_info_handler, info))
 		return -1;
 
-	if (info->auth_supported)
+	if (info->auth_supported)//separate auth and associate command ==>Yajun
 		drv->capa.flags |= WPA_DRIVER_FLAGS_SME;
 	else if (!info->connect_supported) {
 		wpa_printf(MSG_INFO, "nl80211: Driver does not support "

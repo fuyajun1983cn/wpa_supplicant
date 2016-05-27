@@ -1181,7 +1181,8 @@ struct wpa_driver_capa {
  * it cannot be used for P2P group operations or non-P2P purposes.
  */
 #define WPA_DRIVER_FLAGS_P2P_DEDICATED_INTERFACE	0x00000400
-/** This interface is P2P capable (P2P GO or P2P Client) */
+/** This interface is P2P capable (P2P GO or P2P Client) */ 
+//May be used for non-P2P purpose? ==> Yajun
 #define WPA_DRIVER_FLAGS_P2P_CAPABLE	0x00000800
 /** Driver supports station and key removal when stopping an AP */
 #define WPA_DRIVER_FLAGS_AP_TEARDOWN_SUPPORT		0x00001000

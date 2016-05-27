@@ -1353,6 +1353,7 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 		goto fail;
 	}
 
+	//select a channel ==>Yajun
 	if (go && p2p_go_select_channel(p2p, dev, &status) < 0)
 		goto fail;
 

@@ -1703,7 +1703,7 @@ void wpa_supplicant_associate(struct wpa_supplicant *wpa_s,
 
 	if ((wpa_s->drv_flags & WPA_DRIVER_FLAGS_SME) &&
 	    ssid->mode == IEEE80211_MODE_INFRA) {
-		sme_authenticate(wpa_s, bss, ssid);
+		sme_authenticate(wpa_s, bss, ssid);//send auth request
 		return;
 	}
 
@@ -2254,7 +2254,7 @@ static void wpas_start_assoc_cb(struct wpa_radio_work *work, int deinit)
 	 * element in all cases, it is justifiable to skip it to avoid
 	 * interoperability issues.
 	 */
-	if (!bss || wpa_bss_get_ie(bss, WLAN_EID_EXT_CAPAB)) {
+	if (!bss || wpa_bss_get_ie(bss, WLAN_EID_EXT_CAPAB)) {//Check if bss include Extended Capabilities IE ==>Yajun
 		u8 ext_capab[18];
 		int ext_capab_len;
 		ext_capab_len = wpas_build_ext_capab(wpa_s, ext_capab,
@@ -5430,7 +5430,7 @@ void wpas_connection_failed(struct wpa_supplicant *wpa_s, const u8 *bssid)
 		 * next. Otherwise, we may as well try this one once more
 		 * before allowing other, likely worse, ESSes to be considered.
 		 */
-		freqs = get_bss_freqs_in_ess(wpa_s);
+		freqs = get_bss_freqs_in_ess(wpa_s);//get other bss with the same ESS SSID ==>Yajun
 		if (freqs) {
 			wpa_dbg(wpa_s, MSG_DEBUG, "Another BSS in this ESS "
 				"has been seen; try it next");
@@ -5441,7 +5441,7 @@ void wpas_connection_failed(struct wpa_supplicant *wpa_s, const u8 *bssid)
 			 * common load balancing use case.
 			 */
 			os_free(wpa_s->next_scan_freqs);
-			wpa_s->next_scan_freqs = freqs;
+			wpa_s->next_scan_freqs = freqs;  //freq scan list ==>Yajun
 		}
 	}
 

@@ -6,6 +6,15 @@
  * See README for more details.
  */
 
+ /*
+
+	SME was designed to be used when the driver
+does provide the separate authentication and association commands.
+
+	REF: http://permalink.gmane.org/gmane.linux.drivers.hostap/20336
+
+ */
+
 #include "includes.h"
 
 #include "common.h"

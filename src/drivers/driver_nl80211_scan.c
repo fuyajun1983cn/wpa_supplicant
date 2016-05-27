@@ -128,6 +128,11 @@ nl80211_scan_common(struct i802_bss *bss, u8 cmd,
 			wpa_hexdump_ascii(MSG_MSGDUMP, "nl80211: Scan SSID",
 					  params->ssids[i].ssid,
 					  params->ssids[i].ssid_len);
+#ifdef CONFIG_FYJ_P2P
+//SKIP null ssid ==>Yajun
+if (params->ssids[i].ssid_len == 0)
+	continue;
+#endif
 			if (nla_put(msg, i + 1, params->ssids[i].ssid_len,
 				    params->ssids[i].ssid))
 				goto fail;

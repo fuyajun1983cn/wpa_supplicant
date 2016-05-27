@@ -7303,11 +7303,29 @@ static void wpas_ctrl_scan(struct wpa_supplicant *wpa_s, char *params,
 	struct wpa_ssid_value *ssid = NULL, *ns;
 	unsigned int ssid_count = 0;
 
+	struct wpa_supplicant *orig_wpa_s;
+
 	if (wpa_s->wpa_state == WPA_INTERFACE_DISABLED) {
 		*reply_len = -1;
 		return;
 	}
 
+	
+
+         //{{{ ==>Yajun  block scan request when Miracast is on going.
+         orig_wpa_s = wpa_s;
+	for (wpa_s = wpa_s->global->ifaces;wpa_s; wpa_s = wpa_s->next) {
+		if (!os_strncmp(wpa_s->ifname, "p2p", 3) && wpa_s->wpa_state == WPA_COMPLETED
+			&& os_strcmp(orig_wpa_s->ifname, "wlan0")) {
+			wpa_printf(MSG_DEBUG, "Miracast(p2p) is on going, block scan request any way!\n");
+			*reply_len = os_snprintf(reply, reply_size, "BLOCK-SCAN\n");
+			return;
+		}
+	}
+         //}}}
+
+	wpa_s = orig_wpa_s;
+		 
 	if (radio_work_pending(wpa_s, "scan")) {
 		wpa_printf(MSG_DEBUG,
 			   "Pending scan scheduled - reject new request");
