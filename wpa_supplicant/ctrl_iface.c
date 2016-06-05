@@ -2578,6 +2578,22 @@ static int wpa_supplicant_ctrl_iface_scan_results(
 	struct wpa_bss *bss;
 	int ret;
 
+	struct wpa_supplicant *orig_wpa_s;
+
+	 //{{{ ==>Yajun  block scan request when Miracast is on going.
+         orig_wpa_s = wpa_s;
+	for (wpa_s = wpa_s->global->ifaces;wpa_s; wpa_s = wpa_s->next) {
+		wpa_printf(MSG_ERROR, "ifname: %s,  wpa_state: %d\n", wpa_s->ifname, wpa_s->wpa_state);
+		if (!os_strncmp(wpa_s->ifname, "p2p-p2p0", 8) && wpa_s->wpa_state == WPA_COMPLETED
+			&& !os_strncmp(orig_wpa_s->ifname, "wlan0", 5)) {
+			wpa_printf(MSG_DEBUG, "Miracast(p2p) is on going, block SCAN RESULTS request any way!\n");
+			return 0;
+		}
+	}
+         //}}}
+
+	wpa_s = orig_wpa_s;
+
 	pos = buf;
 	end = buf + buflen;
 	ret = os_snprintf(pos, end - pos, "bssid / frequency / signal level / "
@@ -4343,6 +4359,22 @@ static int wpa_supplicant_ctrl_iface_bss(struct wpa_supplicant *wpa_s,
 	int len;
 	char *ctmp, *end = buf + buflen;
 	unsigned long mask = WPA_BSS_MASK_ALL;
+
+	struct wpa_supplicant *orig_wpa_s;
+
+	 //{{{ ==>Yajun  block scan request when Miracast is on going.
+         orig_wpa_s = wpa_s;
+	for (wpa_s = wpa_s->global->ifaces;wpa_s; wpa_s = wpa_s->next) {
+		wpa_printf(MSG_ERROR, "ifname: %s,  wpa_state: %d\n", wpa_s->ifname, wpa_s->wpa_state);
+		if (!os_strncmp(wpa_s->ifname, "p2p-p2p0", 8) && wpa_s->wpa_state == WPA_COMPLETED
+			&& !os_strncmp(orig_wpa_s->ifname, "wlan0", 5)) {
+			wpa_printf(MSG_DEBUG, "Miracast(p2p) is on going, block BSS COMMAND request any way!\n");
+			return 0;
+		}
+	}
+         //}}}
+
+	wpa_s = orig_wpa_s;
 
 	if (os_strncmp(cmd, "RANGE=", 6) == 0) {
 		if (os_strncmp(cmd + 6, "ALL", 3) == 0) {
@@ -6724,6 +6756,21 @@ static int wpa_supplicant_signal_poll(struct wpa_supplicant *wpa_s, char *buf,
 	struct wpa_signal_info si;
 	int ret;
 	char *pos, *end;
+	struct wpa_supplicant *orig_wpa_s;
+
+	 //{{{ ==>Yajun  block scan request when Miracast is on going.
+         orig_wpa_s = wpa_s;
+	for (wpa_s = wpa_s->global->ifaces;wpa_s; wpa_s = wpa_s->next) {
+		wpa_printf(MSG_ERROR, "ifname: %s,  wpa_state: %d\n", wpa_s->ifname, wpa_s->wpa_state);
+		if (!os_strncmp(wpa_s->ifname, "p2p-p2p0", 8) && wpa_s->wpa_state == WPA_COMPLETED
+			&& !os_strncmp(orig_wpa_s->ifname, "wlan0", 5)) {
+			wpa_printf(MSG_DEBUG, "Miracast(p2p) is on going, block SIGNAL POLL request any way!\n");
+			return -1;
+		}
+	}
+         //}}}
+
+	wpa_s = orig_wpa_s;
 
 	ret = wpa_drv_signal_poll(wpa_s, &si);
 	if (ret)
@@ -7315,8 +7362,8 @@ static void wpas_ctrl_scan(struct wpa_supplicant *wpa_s, char *params,
          //{{{ ==>Yajun  block scan request when Miracast is on going.
          orig_wpa_s = wpa_s;
 	for (wpa_s = wpa_s->global->ifaces;wpa_s; wpa_s = wpa_s->next) {
-		if (!os_strncmp(wpa_s->ifname, "p2p", 3) && wpa_s->wpa_state == WPA_COMPLETED
-			&& os_strcmp(orig_wpa_s->ifname, "wlan0")) {
+		if (!os_strncmp(wpa_s->ifname, "p2p-p2p0", 8) && wpa_s->wpa_state == WPA_COMPLETED
+			&& !os_strncmp(orig_wpa_s->ifname, "wlan0", 5)) {
 			wpa_printf(MSG_DEBUG, "Miracast(p2p) is on going, block scan request any way!\n");
 			*reply_len = os_snprintf(reply, reply_size, "BLOCK-SCAN\n");
 			return;

@@ -1802,7 +1802,7 @@ void p2p_go_complete(struct p2p_data *p2p, struct p2p_device *peer)
 		res.ssid_len = p2p->ssid_len;
 		p2p_random(res.passphrase, p2p->cfg->passphrase_len);
 	} else {
-		res.freq = peer->oper_freq;
+		res.freq = peer->oper_freq; //follow GO's operation channel ==>Yajun
 		if (p2p->ssid_len) {
 			os_memcpy(res.ssid, p2p->ssid, p2p->ssid_len);
 			res.ssid_len = p2p->ssid_len;
@@ -3685,6 +3685,11 @@ static void p2p_go_neg_conf_cb(struct p2p_data *p2p,
 }
 
 
+//发送一些Action帧的回调函数
+//在wpas_p2p_send_action_tx_status中被调用
+//主要是在收到Action传送的反馈状态后，
+//采取一些善后措施，特别是针对传输失败
+//后的一些处理，如重传
 void p2p_send_action_cb(struct p2p_data *p2p, unsigned int freq, const u8 *dst,
 			const u8 *src, const u8 *bssid,
 			enum p2p_send_action_result result)

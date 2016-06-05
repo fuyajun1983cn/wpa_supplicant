@@ -428,13 +428,15 @@ struct p2p_data {
 	unsigned int last_p2p_find_timeout;
 	u8 last_prog_scan_class;
 	u8 last_prog_scan_chan;
+	//set in p2p_notify_scan_trigger_status ==>Yajun
 	int p2p_scan_running;
-	enum p2p_after_scan {
+	enum p2p_after_scan {//指定p2p scan结束后，立即进行的动作==>Yajun
 		P2P_AFTER_SCAN_NOTHING,
 		P2P_AFTER_SCAN_LISTEN,
 		P2P_AFTER_SCAN_CONNECT
 	} start_after_scan;
-	u8 after_scan_peer[ETH_ALEN];
+	//used in processing P2P_AFTER_SCAN_CONNECT in p2p_run_after_scan ==>Yajun
+	u8 after_scan_peer[ETH_ALEN]; 
 	struct p2p_pending_action_tx *after_scan_tx;
 	unsigned int after_scan_tx_in_progress:1;
 	unsigned int send_action_in_progress:1;

@@ -1209,7 +1209,7 @@ int p2p_set_country(struct p2p_data *p2p, const char *country);
 enum p2p_discovery_type {
 	P2P_FIND_START_WITH_FULL,
 	P2P_FIND_ONLY_SOCIAL,
-	P2P_FIND_PROGRESSIVE
+	P2P_FIND_PROGRESSIVE//从当前信道开始扫描，依次递增 ==>Yajun
 };
 
 /**

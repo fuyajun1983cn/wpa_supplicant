@@ -16,6 +16,10 @@
 #include "p2p_i.h"
 #include "p2p.h"
 
+/*
+  *  Go 选择标准:Go Intent & tie breaker
+  *  如果都等于15,则无法决出GO。
+  */
 
 static int p2p_go_det(u8 own_intent, u8 peer_value)
 {
@@ -1192,9 +1196,9 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 			eloop_register_timeout(120, 0, p2p_go_neg_wait_timeout,
 					       p2p, NULL);
 			if (p2p->state == P2P_CONNECT_LISTEN)
-				p2p_set_state(p2p, P2P_WAIT_PEER_CONNECT);
+				p2p_set_state(p2p, P2P_WAIT_PEER_CONNECT);//peer稍后会与我们连接==>Yajun
 			else
-				p2p_set_state(p2p, P2P_WAIT_PEER_IDLE);
+				p2p_set_state(p2p, P2P_WAIT_PEER_IDLE);//当前对端设备闲==>Yajun
 			p2p_set_timeout(p2p, 0, 0);
 		} else {
 			p2p_dbg(p2p, "Stop GO Negotiation attempt");
@@ -1246,6 +1250,9 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 		goto fail;
 	}
 
+	/*
+         *  如果不是GO的话，需要记录下GO的SSID  ==>Yajun
+         */
 	if (!go && msg.group_id) {
 		/* Store SSID for Provisioning step */
 		p2p->ssid_len = msg.group_id_len - ETH_ALEN;
@@ -1272,6 +1279,7 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 		/*
 		 * Note: P2P Client may omit Operating Channel attribute to
 		 * indicate it does not have a preference.
+		 * Operating Channel的决定权还是在GO那边==>Yajun
 		 */
 		p2p_dbg(p2p, "No Operating Channel attribute received");
 		status = P2P_SC_FAIL_INVALID_PARAMS;
@@ -1290,7 +1298,7 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 		goto fail;
 	}
 
-	if (msg.operating_channel) {
+	if (msg.operating_channel) {//对方希望的Operating Channel ==>Yajun
 		dev->oper_freq = p2p_channel_to_freq(msg.operating_channel[3],
 						     msg.operating_channel[4]);
 		p2p_dbg(p2p, "Peer operating channel preference: %d MHz",
@@ -1353,7 +1361,8 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 		goto fail;
 	}
 
-	//select a channel ==>Yajun
+	//select a channel 
+	//GO要确定信道==>Yajun
 	if (go && p2p_go_select_channel(p2p, dev, &status) < 0)
 		goto fail;
 
@@ -1373,6 +1382,7 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 fail:
 	/* Store GO Negotiation Confirmation to allow retransmission */
 	wpabuf_free(dev->go_neg_conf);
+	//Build Go Negotiation Confirmation ==>Yajun
 	dev->go_neg_conf = p2p_build_go_neg_conf(p2p, dev, msg.dialog_token,
 						 status, msg.operating_channel,
 						 go);
@@ -1385,13 +1395,18 @@ fail:
 		dev->go_state = go ? LOCAL_GO : REMOTE_GO;
 	} else
 		p2p->pending_action_state = P2P_NO_PENDING_ACTION;
+
+	//如果rx_freq不为空，则优先选择收到帧时所在的信道
+	//否则，采用Listen channel
+	//确保对方能够在合适的信道上收到我们回的
+	//GO Negotiation Confirmation ==>Yajun
 	if (rx_freq > 0)
 		freq = rx_freq;
 	else
 		freq = dev->listen_freq;
 
 	dev->go_neg_conf_freq = freq;
-	dev->go_neg_conf_sent = 0;
+	dev->go_neg_conf_sent = 0;//发送GO Neg Confirmation 重传的次数
 
 	if (p2p_send_action(p2p, freq, sa, p2p->cfg->dev_addr, sa,
 			    wpabuf_head(dev->go_neg_conf),
