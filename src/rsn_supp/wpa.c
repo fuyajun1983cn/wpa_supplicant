@@ -615,6 +615,26 @@ static int wpa_supplicant_install_ptk(struct wpa_sm *sm,
 	enum wpa_alg alg;
 	const u8 *key_rsc;
 
+	/*
+	@tk_to_set
+
+	('Clear TK part of PTK
+	after driver key configuration') started clearing TK from memory
+	immediately after having configured it to the driver when processing
+	EAPOL-Key message 3/4. While this covered the most common case, it did
+	not take into account the possibility of the authenticator having to
+	retry EAPOL-Key message 3/4 in case the first EAPOL-Key message 4/4
+	response is lost. That case ended up trying to reinstall the same TK to
+	the driver, but the key was not available anymore.
+
+	Fix the EAPOL-Key message 3/4 retry case by configuring TK to the driver
+	only once. There was no need to try to set the same key after each
+	EAPOL-Key message 3/4 since TK could not change. If actual PTK rekeying
+	is used, the new TK will be configured once when processing the new
+	EAPOL-Key message 3/4 for the first time.
+
+	*/
+
 	if (!sm->tk_to_set) {
 		wpa_dbg(sm->ctx->msg_ctx, MSG_DEBUG,
 			"WPA: Do not re-install same PTK to the driver");
@@ -648,6 +668,7 @@ static int wpa_supplicant_install_ptk(struct wpa_sm *sm,
 		wpa_hexdump(MSG_DEBUG, "WPA: RSC", key_rsc, rsclen);
 	}
 
+	//set PTK
 	if (wpa_sm_set_key(sm, alg, sm->bssid, 0, 1, key_rsc, rsclen,
 			   sm->ptk.tk, keylen) < 0) {
 		wpa_msg(sm->ctx->msg_ctx, MSG_WARNING,
@@ -659,7 +680,7 @@ static int wpa_supplicant_install_ptk(struct wpa_sm *sm,
 
 	/* TK is not needed anymore in supplicant */
 	os_memset(sm->ptk.tk, 0, WPA_TK_MAX_LEN);
-	sm->tk_to_set = 0;
+	sm->tk_to_set = 0;// to prevent reset PTK when retry message 3/4 ==>Yajun
 
 	if (sm->wpa_ptk_rekey) {
 		eloop_cancel_timeout(wpa_sm_rekey_ptk, sm, NULL);
@@ -1262,7 +1283,7 @@ static void wpa_supplicant_process_3_of_4(struct wpa_sm *sm,
 	sm->renew_snonce = 1;
 
 	if (key_info & WPA_KEY_INFO_INSTALL) {
-		if (wpa_supplicant_install_ptk(sm, key))
+		if (wpa_supplicant_install_ptk(sm, key)) //only install ptk once for the same session ==>Yajun
 			goto failed;
 	}
 

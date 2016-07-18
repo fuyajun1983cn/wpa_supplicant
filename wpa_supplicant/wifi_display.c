@@ -281,7 +281,9 @@ int wifi_display_subelem_set(struct wpa_global *global, char *cmd)
 	return 0;
 }
 
-
+//a utility function to set WFD	
+//subelements from ies
+//==>Yajun
 int wifi_display_subelem_set_from_ies(struct wpa_global *global,
 				      struct wpabuf *ie)
 {

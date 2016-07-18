@@ -424,7 +424,7 @@ static u8 * hostapd_gen_probe_resp(struct hostapd_data *hapd,
 	/* Power Constraint element */
 	pos = hostapd_eid_pwr_constraint(hapd, pos);
 
-	/* CSA IE */
+	/* CSA(Channel Switch Announcement IE */
 	csa_pos = hostapd_eid_csa(hapd, pos);
 	if (csa_pos != pos)
 		hapd->cs_c_off_proberesp = csa_pos - (u8 *) resp - 1;

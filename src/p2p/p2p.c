@@ -3613,6 +3613,16 @@ static void p2p_go_neg_resp_failure_cb(struct p2p_data *p2p, int success,
 		if (dev &&
 		    dev->status == P2P_SC_FAIL_INFO_CURRENTLY_UNAVAILABLE)
 			dev->flags |= P2P_DEV_PEER_WAITING_RESPONSE;
+
+			//P2P: Clear the discovery state in case of deffered GO Neg response
+			if ((p2p->state == P2P_SEARCH) ||
+			    (p2p->state == P2P_LISTEN_ONLY)) {
+				/* Clear our search state or Listen state since
+				 * now peer is awaiting response from our side.
+				 */
+				p2p_dbg(p2p, "Clear the P2P discovery state");
+				p2p_stop_find(p2p);
+			}
 	}
 
 	if (p2p->state == P2P_SEARCH || p2p->state == P2P_SD_DURING_FIND)

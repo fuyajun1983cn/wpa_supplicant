@@ -153,7 +153,7 @@ struct p2p_device {
 struct p2p_sd_query {
 	struct p2p_sd_query *next;
 	u8 peer[ETH_ALEN];
-	int for_all_peers;
+	int for_all_peers; //接收SD Request Broadcast请求的设备个数==> Yajun
 	int wsd; /* Wi-Fi Display Service Discovery Request */
 	struct wpabuf *tlvs;
 };
@@ -252,11 +252,13 @@ struct p2p_data {
 
 	/**
 	 * min_disc_int - minDiscoverableInterval
+	 * listen time is too short to receive the response frames
+	 * default is 100 ms, 即min_disc_int = 1
 	 */
 	int min_disc_int;
 
 	/**
-	 * max_disc_int - maxDiscoverableInterval
+	 * max_disc_int - maxDiscoverableInterval, Default is set to 3
 	 */
 	int max_disc_int;
 
@@ -437,7 +439,7 @@ struct p2p_data {
 	} start_after_scan;
 	//used in processing P2P_AFTER_SCAN_CONNECT in p2p_run_after_scan ==>Yajun
 	u8 after_scan_peer[ETH_ALEN]; 
-	struct p2p_pending_action_tx *after_scan_tx;
+	struct p2p_pending_action_tx *after_scan_tx;//记录扫描完成后要做的TX ==>Yajun
 	unsigned int after_scan_tx_in_progress:1;
 	unsigned int send_action_in_progress:1;
 

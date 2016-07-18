@@ -993,7 +993,7 @@ static struct wpa_ssid * wpas_wps_add_network(struct wpa_supplicant *wpa_s,
 		return NULL;
 	wpas_notify_network_added(wpa_s, ssid);
 	wpa_config_set_network_defaults(ssid);
-	ssid->temporary = 1; //tempary network, not saved  ==>Yajun
+	ssid->temporary = 1; //tempary network, not saved, will reassociate after wps  ==>Yajun
 	if (wpa_config_set(ssid, "key_mgmt", "WPS", 0) < 0 ||
 	    wpa_config_set(ssid, "eap", "WSC", 0) < 0 ||
 	    wpa_config_set(ssid, "identity", registrar ?

@@ -1243,6 +1243,7 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 		goto fail;
 	}
 
+	//决出GO  ==>Yajun
 	go = p2p_go_det(p2p->go_intent, *msg.go_intent);
 	if (go < 0) {
 		p2p_dbg(p2p, "Incompatible GO Intent");
@@ -1371,7 +1372,7 @@ void p2p_process_go_neg_resp(struct p2p_data *p2p, const u8 *sa,
 	 * GO.
 	 */
 	if (go)
-		p2p_check_pref_chan(p2p, go, dev, &msg);
+		p2p_check_pref_chan(p2p, go, dev, &msg);//此处可以应用AutoChannelSeletct机制
 
 	p2p_set_state(p2p, P2P_GO_NEG);
 	p2p_clear_timeout(p2p);
@@ -1406,7 +1407,7 @@ fail:
 		freq = dev->listen_freq;
 
 	dev->go_neg_conf_freq = freq;
-	dev->go_neg_conf_sent = 0;//发送GO Neg Confirmation 重传的次数
+	dev->go_neg_conf_sent = 0;//发送GO Neg Confirmation 重传的次数==> Yajun
 
 	if (p2p_send_action(p2p, freq, sa, p2p->cfg->dev_addr, sa,
 			    wpabuf_head(dev->go_neg_conf),
@@ -1415,7 +1416,7 @@ fail:
 		p2p_go_neg_failed(p2p, -1);
 		p2p->cfg->send_action_done(p2p->cfg->cb_ctx);
 	} else
-		dev->go_neg_conf_sent++;
+		dev->go_neg_conf_sent++;  //记录一次发送Go Neg Confirmation ==>Yajun
 	if (status != P2P_SC_SUCCESS) {
 		p2p_dbg(p2p, "GO Negotiation failed");
 		p2p_go_neg_failed(p2p, status);

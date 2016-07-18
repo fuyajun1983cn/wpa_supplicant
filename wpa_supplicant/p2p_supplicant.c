@@ -849,6 +849,10 @@ static int wpas_p2p_group_delete(struct wpa_supplicant *wpa_s,
 	if (wpa_s->p2p_group_interface == P2P_GROUP_INTERFACE_GO)
 		gtype = "GO";
 	else if (wpa_s->p2p_group_interface == P2P_GROUP_INTERFACE_CLIENT ||
+		/*   ==>Yajun
+			Is there any reason for checking INFRA mode in p2p module?
+			Yes, WPAS_MODE_INFRA is used for P2P Client as well as non-P2P station.
+		   */
 		 (ssid && ssid->mode == WPAS_MODE_INFRA)) {
 		wpa_s->reassociate = 0;
 		wpa_s->disconnected = 1;
@@ -955,6 +959,10 @@ static int wpas_p2p_group_delete(struct wpa_supplicant *wpa_s,
 	}
 
 	wpa_s->show_group_started = 0;
+	/**
+	  Framework will disconnect WFD after supplicant build p2p connection 
+	  with GO MAC 00:00:00:00:00:00 in invitation case
+	  */
 	os_free(wpa_s->go_params);
 	wpa_s->go_params = NULL;
 
@@ -996,6 +1004,22 @@ static int wpas_p2p_group_delete(struct wpa_supplicant *wpa_s,
 		wpa_drv_deinit_p2p_cli(wpa_s);
 
 	os_memset(wpa_s->go_dev_addr, 0, ETH_ALEN);
+
+	/*
+	Clear p2p_group_formation
+	
+	1. For this case, p2p GC was deauthed by GO unexpectly. supplicant
+	will keep p2p in progress state, which will block AIS scan. So clear
+	p2p_group_formation when p2p group was deleted.
+
+	2. 
+	supplicant will generate next p2p_group_formation when do next p2p
+	negotiation
+	**/
+#ifdef CONFIG_FYJ_P2P	
+	wpa_s->global->p2p_group_formation = NULL;
+	wpa_printf(MSG_DEBUG, "P2P: Clear p2p_group_formation");
+#endif
 
 	return 0;
 }
@@ -2158,6 +2182,7 @@ static void wpas_go_neg_completed(void *ctx, struct p2p_go_neg_results *res)
 {
 	struct wpa_supplicant *wpa_s = ctx;
 
+	//如果这两个值不为0，说明当时正在执行p2p listen ==>Yajun
 	if (wpa_s->off_channel_freq || wpa_s->roc_waiting_drv_freq) {
 		wpa_drv_cancel_remain_on_channel(wpa_s);
 		wpa_s->off_channel_freq = 0;
@@ -5374,6 +5399,12 @@ int wpas_p2p_connect(struct wpa_supplicant *wpa_s, const u8 *peer_addr,
 	if (go_intent < 0)
 		go_intent = wpa_s->conf->p2p_go_intent;
 
+	/*
+	  * 如果只进行Auth而不启动p2p group formation
+	  * 则可能需要进入p2p listen only，否则，不需要进入Listen Only
+	  * 因为此时需要主动发送一些Probe Request请求，即
+	  * 使用p2p find
+	*/
 	if (!auth)
 		wpa_s->p2p_long_listen = 0;
 
@@ -5382,7 +5413,10 @@ int wpas_p2p_connect(struct wpa_supplicant *wpa_s, const u8 *peer_addr,
 	wpa_s->p2p_persistent_id = persistent_id;
 	wpa_s->p2p_go_intent = go_intent;
 	wpa_s->p2p_connect_freq = freq;
+	//在invoke persistent group失败后，是否
+	//进入GO Negotiation
 	wpa_s->p2p_fallback_to_go_neg = 0;
+	//是否在进入Go Negotiation前发送Provision Discovery.
 	wpa_s->p2p_pd_before_go_neg = !!pd;
 	wpa_s->p2p_go_ht40 = !!ht40;
 	wpa_s->p2p_go_vht = !!vht;
@@ -5462,7 +5496,7 @@ int wpas_p2p_connect(struct wpa_supplicant *wpa_s, const u8 *peer_addr,
 		os_memset(wpa_s->go_dev_addr, 0, ETH_ALEN);
 	}
 
-	if (auth) {
+	if (auth) {//只进入Auth，不进行Go Negotiation
 		if (wpas_p2p_auth_go_neg(wpa_s, peer_addr, wps_method,
 					 go_intent, if_addr,
 					 force_freq, persistent_group, ssid,

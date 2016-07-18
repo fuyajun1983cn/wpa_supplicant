@@ -73,7 +73,7 @@ struct i802_bss {
 
 	void *ctx;
 	struct nl_handle *nl_preq, *nl_mgmt;
-	struct nl_cb *nl_cb;
+	struct nl_cb *nl_cb;//处理某个BSS上传送的Action Frame ==>Yajun
 
 	struct nl80211_wiphy_data *wiphy_data;
 	struct dl_list wiphy_list;
@@ -165,7 +165,7 @@ struct wpa_driver_nl80211_data {
 
 	struct i802_bss *first_bss;
 
-	int eapol_tx_sock;
+	int eapol_tx_sock;//接收EAPOL TX Status信息==>Yajun
 
 	int eapol_sock; /* socket for EAPOL frames */
 

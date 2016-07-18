@@ -5,6 +5,10 @@
  * This software may be distributed under the terms of the BSD license.
  * See README for more details.
  */
+// ==>Yajun
+//used in 80211s, SAE is used
+//to derive a PMK that can be used in the next step.
+//more security gained 
 
 #ifndef SAE_H
 #define SAE_H

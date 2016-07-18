@@ -698,6 +698,9 @@ static int wpa_driver_nl80211_get_info(struct wpa_driver_nl80211_data *drv,
 	if (info->p2p_concurrent) {
 		wpa_printf(MSG_DEBUG, "nl80211: Use separate P2P group "
 			   "interface (driver advertised support)");
+		//新建的group interface可以处理p2p管理帧，
+		//也可以处理非p2p管理帧，如关联到GO。
+		//==>Yajun
 		drv->capa.flags |= WPA_DRIVER_FLAGS_P2P_CONCURRENT;
 		drv->capa.flags |= WPA_DRIVER_FLAGS_P2P_MGMT_AND_NON_P2P;
 	}

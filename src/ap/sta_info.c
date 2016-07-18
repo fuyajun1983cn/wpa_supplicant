@@ -1065,7 +1065,19 @@ void ap_sta_disconnect(struct hostapd_data *hapd, struct sta_info *sta,
 	if (sta == NULL && addr)
 		sta = ap_get_sta(hapd, addr);
 
-	if (addr)
+	/*
+	For "device_ap_sme" devices, the ap_sta_disconnect call in supplicant
+	results in two calls to wpa_driver_nl80211_sta_remove.
+
+	1) ap_sta_disconnect > hostapd_drv_sta_deauth > wpa_driver_nl80211_sta_remove
+	2) ap_sta_disconnect > ap_sta_deauth_cb_timeout > ap_sta_remove >
+	wpa_driver_nl80211_sta_remove
+
+	The ap_sta_deauth_cb_timeout is invoked immediately (timeout of [0,0])
+	for device_ap_sme devices. So the hostapd_drv_sta_deauth call
+	 can be avoided for devices without WPA_DRIVER_FLAGS_DEAUTH_TX_STATUS set.
+	*/
+	if (addr && (hapd->iface->drv_flags & WPA_DRIVER_FLAGS_DEAUTH_TX_STATUS))
 		hostapd_drv_sta_deauth(hapd, addr, reason);
 
 	if (sta == NULL)

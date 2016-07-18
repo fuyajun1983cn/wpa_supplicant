@@ -7350,7 +7350,7 @@ static void wpas_ctrl_scan(struct wpa_supplicant *wpa_s, char *params,
 	struct wpa_ssid_value *ssid = NULL, *ns;
 	unsigned int ssid_count = 0;
 
-	struct wpa_supplicant *orig_wpa_s;
+	struct wpa_supplicant *orig_wpa_s;// ==>Yajun
 
 	if (wpa_s->wpa_state == WPA_INTERFACE_DISABLED) {
 		*reply_len = -1;

@@ -726,10 +726,10 @@ static void wpa_supplicant_scan(void *eloop_ctx, void *timeout_ctx)
 		return;
 	}
 
-	if (wpa_s->conf->ap_scan == 2)
+	if (wpa_s->conf->ap_scan == 2)//should not used in nl80211
 		max_ssids = 1;
 	else {
-		max_ssids = wpa_s->max_scan_ssids;
+		max_ssids = wpa_s->max_scan_ssids;//driver's capability
 		if (max_ssids > WPAS_MAX_SCAN_SSIDS)
 			max_ssids = WPAS_MAX_SCAN_SSIDS;
 	}
@@ -852,6 +852,11 @@ static void wpa_supplicant_scan(void *eloop_ctx, void *timeout_ctx)
 		 */
 		wpa_s->reattach = 0;
 	} else {
+		/*
+			full scan
+			扫描当前的ssid列表中的网络或者配置文件中保存的
+			ssid网络(保存的网络中scan_ssid=1)
+		*/
 		struct wpa_ssid *start = ssid, *tssid;
 		int freqs_set = 0;
 		if (ssid == NULL && max_ssids > 1)
