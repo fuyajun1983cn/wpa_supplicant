@@ -853,7 +853,7 @@ static int wpas_p2p_group_delete(struct wpa_supplicant *wpa_s,
 			Is there any reason for checking INFRA mode in p2p module?
 			Yes, WPAS_MODE_INFRA is used for P2P Client as well as non-P2P station.
 		   */
-		 (ssid && ssid->mode == WPAS_MODE_INFRA)) {
+		 (ssid && ssid->mode == WPAS_MODE_INFRA)) {//for gc 
 		wpa_s->reassociate = 0;
 		wpa_s->disconnected = 1;
 		gtype = "client";
@@ -1353,7 +1353,7 @@ static void wpas_group_formation_completed(struct wpa_supplicant *wpa_s,
 
 	persistent = 0;
 	if (ssid) {
-		client = ssid->mode == WPAS_MODE_INFRA;
+		client = ssid->mode == WPAS_MODE_INFRA;//when gc, mode is WPAS_MODE_INFRA ==>Yajun
 		if (ssid->mode == WPAS_MODE_P2P_GO) {
 			persistent = ssid->p2p_persistent_group;
 			os_memcpy(go_dev_addr, wpa_s->global->p2p_dev_addr,
