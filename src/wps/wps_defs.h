@@ -240,6 +240,7 @@ enum wps_error_indication {
 #define WPS_RF_60GHZ 0x04
 
 /* Config Methods */
+//config_methods=display pbc label keypad physical_display virtual_display push_button virtual_push_button physical_push_button
 #define WPS_CONFIG_USBA 0x0001
 #define WPS_CONFIG_ETHERNET 0x0002
 #define WPS_CONFIG_LABEL 0x0004

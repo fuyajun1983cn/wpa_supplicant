@@ -6,6 +6,27 @@
  * See README for more details.
  */
 
+ /**
+	
+ 	Purpose of provisioning is to get user credential (WPS PIN or PBC) 
+ 	for WPS procedure. P2P GO shall use the operating channel as indicated 
+ 	during GO negotiation.
+
+	When a P2P Device joins an existing P2P Group that it has not stored a 
+	credential for, it shall send a Provision Discovery Request frame with a single 
+	method set in the Config Methods attribute to indicate the desire to enroll in 
+	the network.
+
+	The Provision Discovery Request frame shall be sent to the P2P Device Address 
+	of the P2P Group Owner and on the operating channel of the P2P Group.
+
+	The P2P Group Owner may use this frame as a trigger that a device wants to 
+	enroll (maybe an indication can be shown to the user). A P2P Group Owner 
+	shall respond to a received Provision Discovery Request frame with a Provision 
+	Discovery Response frame.
+
+ */
+
 #include "includes.h"
 
 #include "common.h"
@@ -774,6 +795,13 @@ void p2p_process_prov_disc_req(struct p2p_data *p2p, const u8 *sa,
 			p2p_dbg(p2p, "Keypad - always defer");
 			auto_accept = 0;
 		}
+
+		./**
+			 In case of P2PS PD Request with no common channels, defer
+   the flow unless auto accept equals true and the connection
+   capabilities equals NEW (in which case the channels would be
+   negotiated in the GO Negotiation).
+   		  */
 
 		if ((remote_conncap & (P2PS_SETUP_NEW | P2PS_SETUP_CLIENT) ||
 		     msg.persistent_dev) && conncap != P2PS_SETUP_NEW &&

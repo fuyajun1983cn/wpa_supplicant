@@ -38,7 +38,7 @@ struct hostap_driver_data {
 	struct hostapd_data *hapd;
 
 	char iface[IFNAMSIZ + 1];
-	int sock; /* raw packet socket for driver access */
+	int sock; /* raw packet socket for driver access */ /*mainly for EAPOL package  ==>Yajun */
 	int ioctl_sock; /* socket for ioctl() use */
 	struct netlink_data *netlink;
 
@@ -136,7 +136,7 @@ static void handle_tx_callback(struct hostap_driver_data *drv, u8 *buf,
 	wpa_supplicant_event(drv->hapd, EVENT_TX_STATUS, &event);
 }
 
-
+//handle L2 packets ==>Yajun
 static void handle_frame(struct hostap_driver_data *drv, u8 *buf, size_t len)
 {
 	struct ieee80211_hdr *hdr;
@@ -196,7 +196,9 @@ static void handle_frame(struct hostap_driver_data *drv, u8 *buf, size_t len)
 	}
 }
 
-
+/*
+    process L2 packets ==>Yajun
+  */
 static void handle_read(int sock, void *eloop_ctx, void *sock_ctx)
 {
 	struct hostap_driver_data *drv = eloop_ctx;
