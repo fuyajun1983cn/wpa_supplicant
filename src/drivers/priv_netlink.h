@@ -41,7 +41,7 @@
 #define NETLINK_ROUTE 0
 #define RTMGRP_LINK 1
 #define RTM_BASE 0x10
-#define RTM_NEWLINK (RTM_BASE + 0)
+#define RTM_NEWLINK (RTM_BASE + 0) //interface addition events
 #define RTM_DELLINK (RTM_BASE + 1)
 #define RTM_SETLINK (RTM_BASE + 3)
 

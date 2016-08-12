@@ -889,7 +889,7 @@ nl80211_find_drv(struct nl80211_global *global, int idx, u8 *buf, size_t len)
 	return NULL;
 }
 
-
+//net interface added
 static void wpa_driver_nl80211_event_rtm_newlink(void *ctx,
 						 struct ifinfomsg *ifi,
 						 u8 *buf, size_t len)

@@ -29,7 +29,7 @@ struct nl80211_global {
 	int if_add_ifindex;
 	u64 if_add_wdevid;
 	int if_add_wdevid_set;
-	struct netlink_data *netlink;
+	struct netlink_data *netlink; //ROUTE Netlink ==>Yajun
 	struct nl_cb *nl_cb;
 	struct nl_handle *nl;
 	int nl80211_id;

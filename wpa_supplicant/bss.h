@@ -68,7 +68,7 @@ struct wpa_bss {
 	/** Number of counts without seeing this BSS */
 	unsigned int scan_miss_count;
 	/** Index of the last scan update */
-	unsigned int last_update_idx;
+	unsigned int last_update_idx; //need keey sync with wpa_supplicant -> bss_update_idx when be scanned.
 	/** Information flags about the BSS/IBSS (WPA_BSS_*) */
 	unsigned int flags;
 	/** BSSID */

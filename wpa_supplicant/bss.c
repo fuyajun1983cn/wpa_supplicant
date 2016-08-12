@@ -387,6 +387,12 @@ static struct wpa_bss * wpa_bss_add(struct wpa_supplicant *wpa_s,
 	if (bss == NULL)
 		return NULL;
 	bss->id = wpa_s->bss_next_id++;
+	/*
+		mark this bss is updated ==>Yajun
+		when bss->last_update_idx < wpa_s->bss_update_idx, 
+		it means this bss has missed update one time.
+		if has missed bss_expiration_scan_count times, we should delete this bss
+	*/
 	bss->last_update_idx = wpa_s->bss_update_idx;
 	wpa_bss_copy_res(bss, res, fetch_time);
 	os_memcpy(bss->ssid, ssid, ssid_len);

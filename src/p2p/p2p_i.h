@@ -118,7 +118,7 @@ struct p2p_device {
 #define P2P_DEV_PD_PEER_P2PS BIT(21)
 #define P2P_DEV_LAST_SEEN_AS_GROUP_CLIENT BIT(22)
 
-	unsigned int flags;
+	unsigned int flags;//mark the current status of the p2p device when communcate with peers ==>Yajun
 
 	int status; /* enum p2p_status_code */
 	unsigned int wait_count;
