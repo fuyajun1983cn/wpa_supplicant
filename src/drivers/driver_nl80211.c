@@ -9027,4 +9027,13 @@ const struct wpa_driver_ops wpa_driver_nl80211_ops = {
 	.get_pref_freq_list = nl80211_get_pref_freq_list,
 	.set_prob_oper_freq = nl80211_set_prob_oper_freq,
 #endif /* CONFIG_DRIVER_NL80211_QCA */
+
+#ifndef CONFIG_P2P_AUTO_GO_AS_SOFTAP
+#ifdef ANDROID_P2P
+	.set_noa = wpa_driver_set_p2p_noa,
+	.get_noa = wpa_driver_get_p2p_noa,
+	.set_ap_wps_ie = wpa_driver_set_ap_wps_p2p_ie,
+#endif /* ANDROID_P2P */
+#endif /* CONFIG_P2P_AUTO_GO_AS_SOFTAP */
+
 };

@@ -5739,6 +5739,23 @@ static int p2p_ctrl_group_add(struct wpa_supplicant *wpa_s, char *cmd)
 	int max_oper_chwidth, chwidth = 0, freq2 = 0;
 	char *token, *context = NULL;
 
+#ifdef CONFIG_P2P_AUTO_GO_AS_SOFTAP
+	char *pos2;
+	char *pos3;
+	char *pos4;
+	char *pos5;
+	char ssid[33];
+	char wpapsk[65];
+	char key_mgmt[8];	
+	char pairwise[5];	
+	char proto[5];
+	int ssid_len = 0;
+	int wpapsk_len = 0;
+	int key_mgmt_len = 0;
+	int pairwise_len = 0;
+	int proto_len = 0;
+#endif
+
 	while ((token = str_token(cmd, " ", &context))) {
 		if (sscanf(token, "freq=%d", &freq) == 1 ||
 		    sscanf(token, "freq2=%d", &freq2) == 1 ||
@@ -5759,6 +5776,93 @@ static int p2p_ctrl_group_add(struct wpa_supplicant *wpa_s, char *cmd)
 			return -1;
 		}
 	}
+
+#ifdef CONFIG_P2P_AUTO_GO_AS_SOFTAP
+		if (os_strcmp(cmd, "softap") == 0 ||
+			os_strncmp(cmd, "softap ", 7) == 0)
+		{
+			pos = os_strstr(cmd, "ssid=");		  
+			pos2 = os_strstr(cmd, "wpapsk=");	
+			pos3 = os_strstr(cmd, "key_mgmt=");
+			pos4 = os_strstr(cmd, "pairwise=");
+			pos5 = os_strstr(cmd, "proto=");
+			
+			if (pos) //if there is ssid was set;
+			{
+				pos += 5;
+				ssid_len = (pos2 - 1) - pos;
+				os_memset(ssid, 0, sizeof(ssid));
+				os_memcpy(ssid, pos, ssid_len);
+				ssid[ssid_len] = '\0';	
+				wpa_printf(MSG_INFO, "%s, %d, ssid(pos)=%d\n", __FUNCTION__, __LINE__, ssid_len);
+	
+	
+				if (pos2)
+				{
+					pos2 += 7;
+					wpapsk_len = (pos3 - 1) - pos2;
+					os_memset(wpapsk, 0, sizeof(wpapsk));
+					os_memcpy(wpapsk, pos2, wpapsk_len);
+					wpapsk[wpapsk_len] = '\0';
+					wpa_printf(MSG_INFO, "%s, %d, wpapsk(pos2)=%d\n", __FUNCTION__, __LINE__, wpapsk_len);
+				}
+				else
+				{				
+					wpapsk_len = 0;
+					os_memset(wpapsk, 0, sizeof(wpapsk));				
+				}
+				
+				if (pos3)
+				{
+					pos3 += 9;
+					key_mgmt_len = (pos4 - 1) - pos3;
+					os_memset(key_mgmt, 0, sizeof(key_mgmt));
+					os_memcpy(key_mgmt, pos3, key_mgmt_len);
+					key_mgmt[key_mgmt_len] = '\0';
+					wpa_printf(MSG_INFO, "%s, %d, key_mgmt(pos3)=%d\n", __FUNCTION__, __LINE__, key_mgmt_len);				
+				}
+				else
+				{
+					key_mgmt_len = 0;
+					os_memset(key_mgmt, 0, sizeof(key_mgmt));	
+				}
+	
+				if (pos4)
+				{
+					pos4 += 9;
+					pairwise_len = (pos5 - 1) - pos4;
+					os_memset(pairwise, 0, sizeof(pairwise));
+					os_memcpy(pairwise, pos4, pairwise_len);
+					pairwise[pairwise_len] = '\0';
+					wpa_printf(MSG_INFO, "%s, %d, pairwise(pos4)=%d\n", __FUNCTION__, __LINE__, pairwise_len);				
+				}
+				else
+				{
+					pairwise_len = 0;
+					os_memset(pairwise, 0, sizeof(pairwise));	
+				}
+	
+				if (pos5)
+				{
+					pos5 += 6;
+					proto_len = os_strlen(pos5);
+					os_memset(proto, 0, sizeof(proto));
+					os_memcpy(proto, pos5, proto_len);
+					proto[proto_len] = '\0';
+					wpa_printf(MSG_INFO, "%s, %d, proto(pos5)=%d\n", __FUNCTION__, __LINE__, proto_len);				
+				}
+				else
+				{
+					proto_len = 0;
+					os_memset(proto, 0, sizeof(proto)); 
+				}
+
+				if((ssid_len < 33) && (ssid_len > 0))
+					return wpas_p2p_group_add_as_softap(wpa_s, 1, freq, ht40, ssid, ssid_len, wpapsk, wpapsk_len, key_mgmt, key_mgmt_len, pairwise, pairwise_len, proto, proto_len);			
+			}	
+		}
+#endif	
+
 
 	max_oper_chwidth = parse_freq(chwidth, freq2);
 	if (max_oper_chwidth < 0)

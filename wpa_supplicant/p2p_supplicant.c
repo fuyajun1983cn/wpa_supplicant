@@ -6131,6 +6131,213 @@ int wpas_p2p_group_add(struct wpa_supplicant *wpa_s, int persistent_group,
 	return 0;
 }
 
+#ifdef CONFIG_P2P_AUTO_GO_AS_SOFTAP
+static void wpas_start_wps_go_as_softap(struct wpa_supplicant *wpa_s,
+			      struct p2p_go_neg_results *params,
+			      int group_formation, int key_mgmt, int pairwise_cipher, int proto)
+{
+	struct wpa_ssid *ssid;
+
+	wpa_dbg(wpa_s, MSG_DEBUG, "P2P: Starting GO");
+	if (wpas_copy_go_neg_results(wpa_s, params) < 0) {
+		wpa_dbg(wpa_s, MSG_DEBUG, "P2P: Could not copy GO Negotiation "
+			"results");
+		return;
+	}
+
+	ssid = wpa_config_add_network(wpa_s->conf);
+	if (ssid == NULL) {
+		wpa_dbg(wpa_s, MSG_DEBUG, "P2P: Could not add network for GO");
+		return;
+	}
+
+	wpa_s->show_group_started = 0;
+
+	wpa_config_set_network_defaults(ssid);
+	ssid->temporary = 1;
+	ssid->p2p_group = 1;
+	ssid->p2p_persistent_group = params->persistent_group;
+	ssid->mode = group_formation ? WPAS_MODE_P2P_GROUP_FORMATION :
+		WPAS_MODE_P2P_GO;
+	ssid->frequency = params->freq;
+	ssid->ht40 = params->ht40;
+	ssid->ssid = os_zalloc(params->ssid_len + 1);
+	if (ssid->ssid) {
+		os_memcpy(ssid->ssid, params->ssid, params->ssid_len);
+		ssid->ssid_len = params->ssid_len;
+	}
+	ssid->auth_alg = WPA_AUTH_ALG_OPEN;
+	ssid->key_mgmt = key_mgmt;//WPA_KEY_MGMT_PSK
+	ssid->proto = proto; //WPA_PROTO_RSN;
+	ssid->pairwise_cipher = pairwise_cipher;//WPA_CIPHER_CCMP
+	if (os_strlen(params->passphrase) > 0) {
+		ssid->passphrase = os_strdup(params->passphrase);
+		if (ssid->passphrase == NULL) {
+			wpa_msg_global(wpa_s, MSG_ERROR,
+				       "P2P: Failed to copy passphrase for GO");
+			wpa_config_remove_network(wpa_s->conf, ssid->id);
+			return;
+		}
+	} else
+		ssid->passphrase = NULL;
+	ssid->psk_set = params->psk_set;
+	wpa_dbg(wpa_s, MSG_DEBUG, "P2P: ssid->psk_set: %d "
+		"start GO)", ssid->psk_set); //lk added	
+	if (ssid->psk_set)
+		os_memcpy(ssid->psk, params->psk, sizeof(ssid->psk));
+	else if (ssid->passphrase)
+		wpa_config_update_psk(ssid);
+	ssid->ap_max_inactivity = wpa_s->parent->conf->p2p_go_max_inactivity;
+
+	wpa_s->ap_configured_cb = p2p_go_configured;
+	wpa_s->ap_configured_cb_ctx = wpa_s;
+	wpa_s->ap_configured_cb_data = wpa_s->go_params;
+	wpa_s->connect_without_scan = ssid;
+	wpa_s->reassociate = 1;
+	wpa_s->disconnected = 0;
+	wpa_dbg(wpa_s, MSG_DEBUG, "P2P: Request scan (that will be skipped) to "
+		"start GO)");
+	wpa_supplicant_req_scan(wpa_s, 0, 0);
+}
+
+/**
+ * wpas_p2p_group_add_as_softap - Add a new P2P group with local end as Group Owner with passphrase and ssid parameters.
+ * @wpa_s: Pointer to wpa_supplicant data from wpa_supplicant_add_iface()
+ * @persistent_group: Whether to create a persistent group
+ * @freq: Frequency for the group or 0 to indicate no hardcoding
+ * Returns: 0 on success, -1 on failure
+ *
+ * This function creates a new P2P group with the local end as the Group Owner,
+ * i.e., without using Group Owner Negotiation.
+ */
+int wpas_p2p_group_add_as_softap(struct wpa_supplicant *wpa_s, int persistent_group,
+						int freq, int ht40, u8 *go_ssid,
+						int ssid_len, u8 *go_passphrase, int psk_len, u8 *go_key_mgmt, int key_mgmt_len, u8 *go_pairwise, int pairwise_len, u8 *go_proto, int proto_len)
+{
+        struct p2p_go_neg_results params, *pparams =&params;
+        unsigned int r;
+		int key_mgmt_val = 0, pairwise_chiper_val = 0, proto_val = 0;
+		
+        if (wpa_s->global->p2p_disabled || wpa_s->global->p2p == NULL)
+                return -1;
+
+        /* Make sure we are not running find during connection establishment */
+        wpa_printf(MSG_DEBUG, "P2P: Stop any on-going P2P FIND");
+        wpas_p2p_stop_find_oper(wpa_s);
+
+        if (freq == 2) {
+                wpa_printf(MSG_DEBUG, "P2P: Request to start GO on 2.4 GHz "
+                           "band");
+                if (wpa_s->best_24_freq > 0 &&
+                    p2p_supported_freq(wpa_s->global->p2p,
+                                       wpa_s->best_24_freq)) {
+                        freq = wpa_s->best_24_freq;
+                        wpa_printf(MSG_DEBUG, "P2P: Use best 2.4 GHz band "
+                                   "channel: %d MHz", freq);
+                } else {
+                        os_get_random((u8 *) &r, sizeof(r));
+                        freq = 2412 + (r % 3) * 25;
+                        wpa_printf(MSG_DEBUG, "P2P: Use random 2.4 GHz band "
+                                   "channel: %d MHz", freq);
+                }
+        }
+
+        if (freq == 5) {
+                wpa_printf(MSG_DEBUG, "P2P: Request to start GO on 5 GHz "
+                          "band");
+                if (wpa_s->best_5_freq > 0 &&
+                    p2p_supported_freq(wpa_s->global->p2p,
+                                       wpa_s->best_5_freq)) {
+                        freq = wpa_s->best_5_freq;
+                        wpa_printf(MSG_DEBUG, "P2P: Use best 5 GHz band "
+                                   "channel: %d MHz", freq);
+                } else {
+                        os_get_random((u8 *) &r, sizeof(r));
+                        freq = 5180 + (r % 4) * 20;
+                        if (!p2p_supported_freq(wpa_s->global->p2p, freq)) {
+                                wpa_printf(MSG_DEBUG, "P2P: Could not select "
+                                           "5 GHz channel for P2P group");
+                                return -1;
+                        }
+                        wpa_printf(MSG_DEBUG, "P2P: Use random 5 GHz band "
+                                   "channel: %d MHz", freq);
+                }
+        }
+
+        if (freq > 0 && !p2p_supported_freq(wpa_s->global->p2p, freq)) {
+                wpa_printf(MSG_DEBUG, "P2P: The forced channel for GO "
+                           "(%u MHz) is not supported for P2P uses",
+                           freq);
+                return -1;
+        }
+
+        if (wpas_p2p_init_go_params(wpa_s, &params, freq, ht40, NULL))
+                return -1;
+
+        if (params.freq &&
+            !p2p_supported_freq(wpa_s->global->p2p, params.freq)) {
+                wpa_printf(MSG_DEBUG, "P2P: The selected channel for GO "
+                           "(%u MHz) is not supported for P2P uses",
+                           params.freq);
+                return -1;
+        }
+        
+        params.ssid_len = ssid_len;
+        os_memcpy(params.ssid, go_ssid, params.ssid_len);
+        os_memcpy(params.passphrase, go_passphrase, psk_len);
+      
+        params.persistent_group = persistent_group;
+
+		if (go_key_mgmt != NULL)
+		{
+			if (os_strcmp(go_key_mgmt, "WPA-PSK") == 0)
+				key_mgmt_val |= WPA_KEY_MGMT_PSK;
+			else if (os_strcmp(go_key_mgmt, "NONE") == 0)
+				key_mgmt_val |= WPA_KEY_MGMT_NONE;
+		}
+		else			
+			key_mgmt_val |= WPA_KEY_MGMT_PSK;
+
+		if (go_pairwise != NULL)
+		{
+			if (os_strcmp(go_pairwise, "CCMP") == 0)
+				pairwise_chiper_val |= WPA_CIPHER_CCMP;
+			else if (os_strcmp(go_pairwise, "TKIP") == 0)
+				pairwise_chiper_val |= WPA_CIPHER_TKIP;
+			else if (os_strcmp(go_pairwise, "NONE") == 0)
+				pairwise_chiper_val |= WPA_CIPHER_NONE;
+		}
+		else
+			pairwise_chiper_val |= WPA_CIPHER_CCMP;
+
+		if (go_proto != NULL)
+		{
+			if (os_strcmp(go_proto, "WPA2") == 0)
+				proto_val |= WPA_PROTO_RSN;
+			else if (os_strcmp(go_proto, "WPA") == 0)
+				proto_val |= WPA_PROTO_WPA;		
+		}
+		else
+			proto_val |= WPA_PROTO_RSN;
+
+
+		os_strlcpy(wpa_s->ifname, "ap0",sizeof(wpa_s->ifname));
+        wpa_s = wpas_p2p_get_group_iface(wpa_s, 0, 1);
+        if (wpa_s == NULL)
+                return -1;
+
+	wpa_msg(wpa_s, MSG_INFO, P2P_EVENT_GROUP_STARTED
+		"rule ForceGO "
+		"ssid=%s passphrase=%s", params.ssid, params.passphrase);
+
+        wpas_start_wps_go_as_softap(wpa_s, &params, 0, key_mgmt_val, pairwise_chiper_val, proto_val);
+
+        return 0;
+}
+#endif
+
+
+
 
 static int wpas_start_p2p_client(struct wpa_supplicant *wpa_s,
 				 struct wpa_ssid *params, int addr_allocated,
