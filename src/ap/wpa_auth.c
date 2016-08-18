@@ -129,7 +129,7 @@ static inline int wpa_auth_set_key(struct wpa_authenticator *wpa_auth,
 	if (wpa_auth->cb.set_key == NULL)
 		return -1;
 	return wpa_auth->cb.set_key(wpa_auth->cb.ctx, vlan_id, alg, addr, idx,
-				    key, key_len);
+				    key, key_len);//wpa_driver_nl80211_set_key
 }
 
 

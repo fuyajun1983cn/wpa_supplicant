@@ -43,7 +43,7 @@ struct nl80211_wiphy_data {
 	struct dl_list bsss;
 	struct dl_list drvs;
 
-	struct nl_handle *nl_beacons;
+	struct nl_handle *nl_beacons; //process beacon ==>Yajun
 	struct nl_cb *nl_cb;
 
 	int wiphy_idx;

@@ -805,6 +805,13 @@ void wpa_bss_update_end(struct wpa_supplicant *wpa_s, struct scan_info *info,
 	struct wpa_bss *bss, *n;
 
 	os_get_reltime(&wpa_s->last_scan);
+	/*
+  		Do not expire scan results entries based on scan results from a scan
+	that was aborted. The aborted scan did not scan all the requested
+	channels or SSIDs, so the fact that a BSS is missing from the scan
+	results does not mean it is not available.
+	(info && info->aborted)
+	*/
 	if ((info && info->aborted) || !new_scan)
 		return; /* do not expire entries without new scan */
 

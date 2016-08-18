@@ -6469,6 +6469,24 @@ static int wpa_driver_nl80211_probe_req_report(struct i802_bss *bss, int report)
 	return -1;
 }
 
+/**
+	Some drivers (like mac80211) do not accept changing the bitrate
+mask before the network interface is up, thus calling
+nl80211_disable_11b_rates() before the interface is up fails,
+and the P2P network interface continues to use invalid
+bitrates.
+
+	
+To fix this call nl80211_disable_11b_rates() immediately
+after the interface is brought up (and also after rfkill
+is unblocked).
+
+
+	wpa_driver_nl80211_rfkill_unblocked(...)
+	wpa_driver_nl80211_finish_drv_init(...)
+	wpa_driver_nl80211_resume(...)
+	
+*/
 
 static int nl80211_disable_11b_rates(struct wpa_driver_nl80211_data *drv,
 				     int ifindex, int disabled)

@@ -925,7 +925,7 @@ static int hostapd_setup_bss(struct hostapd_data *hapd, int first)
 			}
 		}
 
-		hapd->interface_added = 1;
+		hapd->interface_added = 1;//virtual interfaced has been added ==Yajun
 		if (hostapd_if_add(hapd->iface->bss[0], WPA_IF_AP_BSS,
 				   conf->iface, hapd->own_addr, hapd,
 				   &hapd->drv_priv, force_ifname, if_addr,
