@@ -2451,6 +2451,27 @@ struct wpa_driver_ops {
 	 * @setup_ap: Whether to setup AP for %WPA_IF_AP_BSS interfaces
 	 * Returns: 0 on success, -1 on failure
 	 */
+	/**
+		Make setting up AP optional when creating AP interface
+
+		setup_ap
+
+		When an AP interface it created, it is also setup and subscribes
+		for management frames etc. However, when the interface is added by
+		wpa_supplicant, setting up for AP operations is redundant because
+		it will be done by wpa_supplicant on wpa_drv_init() when setting
+		the interface mode to AP.
+
+		In addition, it may cause wpa_supplicant to fail initializing the
+		interface as it will try to subscribe for management frames on this
+		interface but the interface is already registered.
+
+		Change this, so when adding an AP interface, make setting up the AP
+		optional, and use it only when the interface is added by hostapd but not
+		when it is added by wpa_supplicant.
+
+	  */
+	
 	int (*if_add)(void *priv, enum wpa_driver_if_type type,
 		      const char *ifname, const u8 *addr, void *bss_ctx,
 		      void **drv_priv, char *force_ifname, u8 *if_addr,

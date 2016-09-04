@@ -1255,6 +1255,7 @@ int wpa_supplicant_req_sched_scan(struct wpa_supplicant *wpa_s)
 	prev_state = wpa_s->wpa_state;
 	if (wpa_s->wpa_state == WPA_DISCONNECTED ||
 	    wpa_s->wpa_state == WPA_INACTIVE)
+	    //come here at WSC-Enrollee @yajun
 		wpa_supplicant_set_state(wpa_s, WPA_SCANNING);
 
 	if (wpa_s->autoscan_params != NULL) {

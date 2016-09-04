@@ -681,7 +681,7 @@ struct wpa_supplicant {
 	unsigned int eap_expected_failure:1;
 	unsigned int reattach:1; /* reassociation to the same BSS requested */
 	unsigned int mac_addr_changed:1;
-	unsigned int added_vif:1;
+	unsigned int added_vif:1; //virtual interfaced added ? 
 	unsigned int wnmsleep_used:1;
 
 	struct os_reltime last_mac_addr_change;
@@ -735,7 +735,7 @@ struct wpa_supplicant {
 #endif /* CONFIG_SME */
 
 #ifdef CONFIG_AP
-	struct hostapd_iface *ap_iface;  //ap mode interface
+	struct hostapd_iface *ap_iface;  //ap mode interface, P2P_GO
 	void (*ap_configured_cb)(void *ctx, void *data);
 	void *ap_configured_cb_ctx;
 	void *ap_configured_cb_data;

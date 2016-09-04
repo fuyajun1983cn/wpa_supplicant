@@ -468,7 +468,12 @@ static int wpa_supplicant_match_privacy(struct wpa_bss *bss,
 
 	if (ssid->mixed_cell)
 		return 1;
-
+	/**
+		fixes the issue when supplicant does not select APs in 
+		WEP security mode for WPS registration.
+		
+		WPS: support registration with APs in WEP security mode
+	*/
 #ifdef CONFIG_WPS
 	if (ssid->key_mgmt & WPA_KEY_MGMT_WPS)
 		return 1;

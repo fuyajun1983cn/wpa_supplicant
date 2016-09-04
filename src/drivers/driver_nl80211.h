@@ -30,12 +30,12 @@ struct nl80211_global {
 	u64 if_add_wdevid;
 	int if_add_wdevid_set;
 	struct netlink_data *netlink; //ROUTE Netlink ==>Yajun
-	struct nl_cb *nl_cb;
+	struct nl_cb *nl_cb;  //call process_global_event on this callback
 	struct nl_handle *nl;
 	int nl80211_id;
 	int ioctl_sock; /* socket for ioctl() use */
 
-	struct nl_handle *nl_event;
+	struct nl_handle *nl_event; //process feedback events from driver
 };
 
 struct nl80211_wiphy_data {
@@ -72,7 +72,7 @@ struct i802_bss {
 	int if_dynamic;
 
 	void *ctx;
-	struct nl_handle *nl_preq, *nl_mgmt;
+	struct nl_handle *nl_preq, *nl_mgmt;//enable reporting probe request, action frames
 	struct nl_cb *nl_cb;//处理某个BSS上传送的Action Frame ==>Yajun
 
 	struct nl80211_wiphy_data *wiphy_data;
@@ -132,7 +132,7 @@ struct wpa_driver_nl80211_data {
 	unsigned int use_monitor:1;
 	unsigned int ignore_next_local_disconnect:1;
 	unsigned int ignore_next_local_deauth:1;
-	unsigned int hostapd:1;
+	unsigned int hostapd:1; //It's a hostapd interface? ==>Yajun
 	unsigned int start_mode_ap:1;
 	unsigned int start_iface_up:1;
 	unsigned int test_use_roc_tx:1;

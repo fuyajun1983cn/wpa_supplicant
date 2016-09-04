@@ -480,6 +480,40 @@ static int wpa_supplicant_wps_cred(void *ctx,
 	switch (cred->encr_type) {
 	case WPS_ENCR_NONE:
 		break;
+	/**
+		Deprecated, for learning  ==>Yajun
+		WPS: support WEP keys in hex characters format in received credentials
+	*/
+	case WPS_ENCR_WEP:
+		if (cred->key_len <= 0)
+			break;
+		if (cred->key_len != 5  && cred->key_len != 13 &&
+			cred->key_len != 10 && cred->key_len != 26) {
+			wpa_printf(MSG_ERROR, "WPS: Invalid WEP Key length %i",
+				cred->key_len);
+			return -1;
+		}
+		if (cred->key_idx >= NUM_WEP_KEYS) {
+			wpa_printf(MSG_ERROR, "WPS: Invalid WEP Key index %i",
+				cred->key_idx);
+			return -1;
+		}
+		u8 key_idx = cred->key_idx;
+		if (cred->key_len == 10 || cred->key_len == 26) {
+			if (hexstr2bin((char*)cred->key, ssid->wep_key[key_idx],
+				cred->key_len / 2) < 0) {
+				wpa_printf(MSG_ERROR, "WPS: Invalid WEP Key %i",
+						key_idx);
+				return -1;
+			}
+			ssid->wep_key_len[key_idx] = cred->key_len / 2;
+		} else {
+			os_memcpy(ssid->wep_key[key_idx], cred->key,
+					cred->key_len);
+			ssid->wep_key_len[key_idx] = cred->key_len;
+		}
+		ssid->wep_tx_keyidx = key_idx;
+		break;
 	case WPS_ENCR_TKIP:
 		ssid->pairwise_cipher = WPA_CIPHER_TKIP;
 		break;

@@ -4198,6 +4198,7 @@ static int nl80211_setup_ap(struct i802_bss *bss)
 		if (nl80211_mgmt_subscribe_ap(bss))
 			return -1;
 
+	//we have FullMAC device ==>Yajun
 	if (drv->device_ap_sme && !drv->use_monitor)
 		if (nl80211_mgmt_subscribe_ap_dev_sme(bss))
 			return -1;
@@ -6043,6 +6044,7 @@ static int wpa_driver_nl80211_if_add(void *priv, enum wpa_driver_if_type type,
 		os_memcpy(if_addr, new_addr, ETH_ALEN);
 	}
 
+	//interface added by hostapd ==>Yajun
 	if (type == WPA_IF_AP_BSS && setup_ap) {
 		struct i802_bss *new_bss = os_zalloc(sizeof(*new_bss));
 		if (new_bss == NULL) {

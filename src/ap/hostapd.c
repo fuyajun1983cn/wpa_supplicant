@@ -1049,6 +1049,7 @@ static int hostapd_setup_bss(struct hostapd_data *hapd, int first)
 		return -1;
 	}
 
+	//start to init wpa statemachine
 	if ((conf->wpa || conf->osen) && hostapd_setup_wpa(hapd))
 		return -1;
 
@@ -1057,6 +1058,12 @@ static int hostapd_setup_bss(struct hostapd_data *hapd, int first)
 		return -1;
 	}
 
+	/**
+		Inter-Access Point Protocol
+		 is a recommendation that describes an optional 
+		 extension to IEEE 802.11 that provides wireless 
+		 access point communications among multivendor systems
+	*/
 	if (conf->ieee802_11f &&
 	    (hapd->iapp = iapp_init(hapd, conf->iapp_iface)) == NULL) {
 		wpa_printf(MSG_ERROR, "IEEE 802.11F (IAPP) initialization "
@@ -1111,6 +1118,7 @@ static int hostapd_setup_bss(struct hostapd_data *hapd, int first)
 	if (!conf->start_disabled && ieee802_11_set_beacon(hapd) < 0)
 		return -1;
 
+	//complete wpa state machine
 	if (hapd->wpa_auth && wpa_init_keys(hapd->wpa_auth) < 0)
 		return -1;
 

@@ -332,7 +332,7 @@ struct hostapd_bss_config {
 #ifndef CONFIG_NATIVE_WINDOWS
 	gid_t ctrl_interface_gid;
 #endif /* CONFIG_NATIVE_WINDOWS */
-	int ctrl_interface_gid_set;
+	int ctrl_interface_gid_set;//setting group id of control interface ==>Yajun
 
 	char *ca_cert;
 	char *server_cert;

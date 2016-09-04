@@ -108,7 +108,7 @@ struct hostapd_data {
 	struct hostapd_config *iconf;
 	struct hostapd_bss_config *conf;
 	int interface_added; /* virtual interface added for this BSS */
-	unsigned int started:1;
+	unsigned int started:1;  /* was already started was already started? */
 	unsigned int disabled:1;
 	unsigned int reenable_beacon:1;
 
@@ -154,7 +154,7 @@ struct hostapd_data {
 	int michael_mic_failures;
 	int tkip_countermeasures;
 
-	int ctrl_sock;
+	int ctrl_sock;//control socket for external app monitoring
 	struct wpa_ctrl_dst *ctrl_dst;
 
 	void *ssl_ctx;

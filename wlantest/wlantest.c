@@ -361,7 +361,7 @@ int main(int argc, char *argv[])
 			if (wpa_debug_level > 0)
 				wpa_debug_level--;
 			break;
-		case 'f':
+		case 'f'://pmk file
 			if (add_pmk_file(&wt, optarg) < 0)
 				return -1;
 			break;
