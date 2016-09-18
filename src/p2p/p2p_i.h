@@ -418,7 +418,7 @@ struct p2p_data {
 	int inv_bssid_set;
 	u8 inv_ssid[SSID_MAX_LEN];
 	size_t inv_ssid_len;
-	u8 inv_sa[ETH_ALEN];
+	u8 inv_sa[ETH_ALEN];//address who send us invitation request ==>Yajun
 	u8 inv_group_bssid[ETH_ALEN];
 	u8 *inv_group_bssid_ptr;
 	u8 inv_go_dev_addr[ETH_ALEN];
@@ -572,7 +572,7 @@ struct p2p_message {
 	const u8 *group_info;
 	size_t group_info_len;
 
-	const u8 *group_id;
+	const u8 *group_id; //dev address
 	size_t group_id_len;
 
 	const u8 *device_id;

@@ -2552,7 +2552,7 @@ static void wpas_stop_listen(void *ctx)
 	 * handling Probe Request frames.
 	 */
 	if (!wpa_s->p2p_cli_probe)
-		wpa_drv_probe_req_report(wpa_s, 0);
+		wpa_drv_probe_req_report(wpa_s, 0);//disable probe request reporting when stop listen
 
 	wpas_p2p_listen_work_done(wpa_s);
 }
@@ -6789,6 +6789,12 @@ int wpas_p2p_find(struct wpa_supplicant *wpa_s, unsigned int timeout,
 		  const u8 *dev_id, unsigned int search_delay,
 		  u8 seek_cnt, const char **seek_string, int freq)
 {
+	/*When sending p2p invitation response in progress, skip p2p find*/
+	if (wpa_s->pending_action_tx != NULL && 
+		wpa_s->global->p2p->pending_action_state == P2P_PENDING_INVITATION_RESPONSE) 
+		return -1;
+	wpa_printf(MSG_DEBUG, "p2p->pending_action_state: %d", wpa_s->global->p2p->pending_action_state);
+	/*****/
 	wpas_p2p_clear_pending_action_tx(wpa_s);
 	wpa_s->p2p_long_listen = 0;
 

@@ -15,6 +15,10 @@
 #include "wpa_i.h"
 #include "pmksa_cache.h"
 
+/**
+	WPA (v1) does not use PMKSA caching.
+ */
+
 #ifdef IEEE8021X_EAPOL
 
 static const int pmksa_cache_max_entries = 32;

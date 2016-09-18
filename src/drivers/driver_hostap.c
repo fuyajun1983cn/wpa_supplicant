@@ -6,6 +6,8 @@
  * See README for more details.
  */
 
+ //using socket-based communication ==>Yajun
+
 #include "includes.h"
 #include <sys/ioctl.h>
 

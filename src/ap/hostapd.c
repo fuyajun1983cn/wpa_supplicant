@@ -1640,6 +1640,7 @@ static int hostapd_setup_interface_complete_sync(struct hostapd_iface *iface,
 	}
 	hapd = iface->bss[0];
 
+	//set tx queue QoS related parameters ==>Yajun
 	hostapd_tx_queue_params(iface);
 
 	ap_list_init(iface);

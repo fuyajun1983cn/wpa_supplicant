@@ -767,7 +767,7 @@ struct wpa_supplicant {
 					    enum offchannel_send_action_result
 					    result);
 	unsigned int roc_waiting_drv_freq;
-	int action_tx_wait_time;
+	int action_tx_wait_time; //timeout for tx action
 
 	int p2p_mgmt;  //indicate a p2p interface
 
