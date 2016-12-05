@@ -749,6 +749,7 @@ int wpa_supplicant_create_ap(struct wpa_supplicant *wpa_s,
 	hapd_iface->bss[0]->driver = wpa_s->driver;
 	hapd_iface->bss[0]->drv_priv = wpa_s->drv_priv;
 
+	/* Setting current ssid when entering AP mode */
 	wpa_s->current_ssid = ssid;
 	eapol_sm_notify_config(wpa_s->eapol, NULL, NULL);
 	os_memcpy(wpa_s->bssid, wpa_s->own_addr, ETH_ALEN);

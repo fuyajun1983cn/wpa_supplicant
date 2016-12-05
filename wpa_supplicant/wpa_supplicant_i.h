@@ -257,9 +257,9 @@ struct wpa_global {
 	size_t drv_count;
 	struct os_time suspend_time;
 	struct p2p_data *p2p;
-	struct wpa_supplicant *p2p_init_wpa_s;
-	struct wpa_supplicant *p2p_group_formation;
-	struct wpa_supplicant *p2p_invite_group;
+	struct wpa_supplicant *p2p_init_wpa_s; // control p2p device operation ==> Yajun
+	struct wpa_supplicant *p2p_group_formation;  //p2p group interface, inited in wpas_p2p_init_group_interface, it's parent is p2p_init_wpa_s ==>Yajun
+	struct wpa_supplicant *p2p_invite_group;//
 	u8 p2p_dev_addr[ETH_ALEN];
 	struct os_reltime p2p_go_wait_client;
 	struct dl_list p2p_srv_bonjour; /* struct p2p_srv_bonjour */
@@ -674,7 +674,7 @@ struct wpa_supplicant {
 	struct os_reltime wps_pin_start_time;
 	int blacklist_cleared;
 
-	struct wpabuf *pending_eapol_rx;
+	struct wpabuf *pending_eapol_rx;//queue the eapol key data before receiving the associate event. ==>Yajun
 	struct os_reltime pending_eapol_rx_time;
 	u8 pending_eapol_rx_src[ETH_ALEN];
 	unsigned int last_eapol_matches_bssid:1;
@@ -773,7 +773,7 @@ struct wpa_supplicant {
 
 #ifdef CONFIG_P2P
 	struct p2p_go_neg_results *go_params;
-	int create_p2p_iface;
+	int create_p2p_iface;//should create a separate group interface ? ==> Yajun
 	u8 pending_interface_addr[ETH_ALEN];
 	char pending_interface_name[100];
 	int pending_interface_type;
@@ -796,7 +796,7 @@ struct wpa_supplicant {
 	int p2p_in_invitation;
 	int p2p_invite_go_freq;
 	int pending_invite_ssid_id;
-	int show_group_started;
+	int show_group_started;//for gc, when 4-way handshake completed, report it  ==>Yajun
 	u8 go_dev_addr[ETH_ALEN];
 	int pending_pd_before_join;
 	u8 pending_join_iface_addr[ETH_ALEN];

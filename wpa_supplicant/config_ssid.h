@@ -229,7 +229,7 @@ struct wpa_ssid {
 	 * do support scan_ssid=1 and that should be used with them instead of
 	 * ap_scan=2.
 	 */
-	int scan_ssid;
+	int scan_ssid;  /* =1  means it should be setting ssid. */
 
 #ifdef IEEE8021X_EAPOL
 #define EAPOL_FLAG_REQUIRE_KEY_UNICAST BIT(0)

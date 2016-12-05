@@ -726,6 +726,13 @@ static void wpa_supplicant_scan(void *eloop_ctx, void *timeout_ctx)
 		return;
 	}
 
+	/**
+		for nl80211, ap_scan = 1, scan_ssid=1 can be used.
+		driver_wext only support a ssid per scan. 
+		only driver_nl80211.c uses multiple SSIDs per scan and as such, 
+		has room for adding the wildcard entry each time.
+		@20161018 by Yajun
+	*/
 	if (wpa_s->conf->ap_scan == 2)//should not used in nl80211
 		max_ssids = 1;
 	else {

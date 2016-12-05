@@ -10,6 +10,7 @@
 
 	SME was designed to be used when the driver
 does provide the separate authentication and association commands.
+(separate auth/assoc calls, not one connect)
 
 	REF: http://permalink.gmane.org/gmane.linux.drivers.hostap/20336
 

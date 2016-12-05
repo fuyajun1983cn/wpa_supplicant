@@ -87,7 +87,7 @@ struct hostapd_ssid {
 	unsigned int wpa_psk_set:1;
 
 	char vlan[IFNAMSIZ + 1];
-	secpolicy security_policy;
+	secpolicy security_policy; /* security policy */
 
 	struct hostapd_wpa_psk *wpa_psk;
 	char *wpa_passphrase;

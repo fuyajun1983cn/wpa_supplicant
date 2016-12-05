@@ -1732,7 +1732,7 @@ static int wpas_select_network_from_last_scan(struct wpa_supplicant *wpa_s,
 {
 	struct wpa_bss *selected;
 	struct wpa_ssid *ssid = NULL;
-	int time_to_reenable = wpas_reenabled_network_time(wpa_s);
+	int time_to_reenable = wpas_reenabled_network_time(wpa_s);/* make sure that at least one network is enabled ==Yaun */
 
 	if (time_to_reenable > 0) {
 		wpa_dbg(wpa_s, MSG_DEBUG,
@@ -2583,7 +2583,7 @@ static void wpa_supplicant_event_disassoc(struct wpa_supplicant *wpa_s,
 
 	bssid = wpa_s->bssid;
 	if (is_zero_ether_addr(bssid))
-		bssid = wpa_s->pending_bssid;
+		bssid = wpa_s->pending_bssid; /*the target BSSID when in the state ASSOCIATING */
 
 	if (!is_zero_ether_addr(bssid) ||
 	    wpa_s->wpa_state >= WPA_AUTHENTICATING) {

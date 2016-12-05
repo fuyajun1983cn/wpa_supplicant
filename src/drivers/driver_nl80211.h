@@ -136,7 +136,7 @@ struct wpa_driver_nl80211_data {
 	unsigned int start_mode_ap:1;
 	unsigned int start_iface_up:1;
 	unsigned int test_use_roc_tx:1;
-	unsigned int ignore_deauth_event:1;
+	unsigned int ignore_deauth_event:1; /*refer to driver_nl80211.c @3059*/
 	unsigned int vendor_cmd_test_avail:1;
 	unsigned int roaming_vendor_cmd_avail:1;
 	unsigned int dfs_vendor_cmd_avail:1;

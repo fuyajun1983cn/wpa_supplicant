@@ -2126,7 +2126,7 @@ wpas_p2p_init_group_interface(struct wpa_supplicant *wpa_s, int go)
 	wpa_s->pending_interface_name[0] = '\0';
 	group_wpa_s->p2p_group_interface = go ? P2P_GROUP_INTERFACE_GO :
 		P2P_GROUP_INTERFACE_CLIENT;
-	wpa_s->global->p2p_group_formation = group_wpa_s;
+	wpa_s->global->p2p_group_formation = group_wpa_s;//valid during group formation ==>yajun
 	wpa_s->global->pending_group_iface_for_p2ps = 0;
 
 	wpas_p2p_clone_config(group_wpa_s, wpa_s);

@@ -4199,6 +4199,9 @@ static int nl80211_setup_ap(struct i802_bss *bss)
 			return -1;
 
 	//we have FullMAC device ==>Yajun
+	/**
+	  *  正常情况下，只要是起GO，都会走这条Flow
+	  */
 	if (drv->device_ap_sme && !drv->use_monitor)
 		if (nl80211_mgmt_subscribe_ap_dev_sme(bss))
 			return -1;

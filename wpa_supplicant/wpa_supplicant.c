@@ -2592,7 +2592,7 @@ void wpa_supplicant_deauthenticate(struct wpa_supplicant *wpa_s,
 	else if (!is_zero_ether_addr(wpa_s->pending_bssid) &&
 		 (wpa_s->wpa_state == WPA_AUTHENTICATING ||
 		  wpa_s->wpa_state == WPA_ASSOCIATING))
-		addr = wpa_s->pending_bssid;
+		addr = wpa_s->pending_bssid; /* we are not associated yet */
 	else if (wpa_s->wpa_state == WPA_ASSOCIATING) {
 		/*
 		 * When using driver-based BSS selection, we may not know the

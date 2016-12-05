@@ -472,7 +472,7 @@ struct p2p_data {
 	int cross_connect;
 
 	int best_freq_24;
-	int best_freq_5;
+	int best_freq_5;  /* 5G perfered */
 	int best_freq_overall;
 	int own_freq_preference;
 

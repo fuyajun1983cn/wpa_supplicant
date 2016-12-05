@@ -35,6 +35,22 @@ static int p2p_go_det(u8 own_intent, u8 peer_value)
 	return own_intent > peer_intent;
 }
 
+/**
+	Channel List attribute format:
+
+	Field              		Size (octets)               Value
+	Attribute ID    		1	                            11
+	Length            		2					   variable
+	Country String 		3						
+	Channel Entry List  	variable
+
+	Channel Entry field format:
+
+	Operating Class		1					   
+	Number of Channels 1
+	Channel List             variable
+
+*/
 
 int p2p_peer_channels_check(struct p2p_data *p2p, struct p2p_channels *own,
 			    struct p2p_device *dev,
@@ -920,6 +936,9 @@ void p2p_process_go_neg_req(struct p2p_data *p2p, const u8 *sa,
 			goto fail;
 		}
 
+		/**
+			Check if own & peer have a common channel
+		*/
 		if (p2p_peer_channels(p2p, dev, msg.channel_list,
 				      msg.channel_list_len) < 0) {
 			p2p_dbg(p2p, "No common channels found");
